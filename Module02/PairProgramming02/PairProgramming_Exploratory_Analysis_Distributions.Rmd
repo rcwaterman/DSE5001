@@ -1,0 +1,502 @@
+---
+title: "PairProgramming_Exploratory_Analysis_Distributions"
+author: "HD Sheets"
+date: "2024-08-07"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Pair Programming:  Exploratory Data Analysis,  Distributions
+
+HD Sheets
+August 9, 2024
+Checked 01/03/2025
+
+Student Name: Ryan Waterman
+Teammate Name: Nicholas Perry
+
+See,  Wickham chapter 3
+
+Yakir, chapter 3
+https://eleuven.github.io/statthink/ChapDescriptiveStat.html#displaying-data
+
+Diez, Chapter 4
+
+# Things to watch for in this exercise
+
+-how do we get basic statistics on univariate data
+
+-what do these statistics tell us about the shape of the data
+
+-what are some basic plots we can use in exploratory data analysis to 
+  develop an understanding of our data
+
+
+## Four simple distributions
+
+These are four simple models,  generated using random values
+
+These are *synthetic* or *simulated* data sets, we will use them to develop some
+understanding of the summary statistics and graphics.  We are using R's ability to
+create simulations as a way to develop our understanding.
+
+The values we will look at are from classic algebraically derived models of 
+distributions.    There are 20-20 such models in common use,  you will see a 
+dozen of them regularly.    Always read the Wikipedia article on them if you 
+run into a new one.   
+
+The ones we will look at today are all continuous,  we'll look at discrete 
+distributions later
+
+Today's menu of distributions
+
+  -Continuous Uniform
+  -Gaussian
+  -Exponential
+  -Weibull
+
+# Uniform Distribution
+
+All values in the range are equally likely to occur
+
+-rolling dice, picking cards from a deck, where along a hallway my cat
+drops a toy-   no values are more probable than others
+
+```{R}
+#create a uniform distribution
+uvals=runif(1000,1,6)
+
+# graph this using the simple histogram plot function
+# We'll see the better one in ggplot later
+
+hist(uvals)
+```
+
+# Summary statistics for the Uniform distribution data
+
+Here is how to calculate these values
+
+We can call r functions for each of our univariate variables
+
+```{R}
+library("parameters")
+library("moments")
+
+mean(uvals)
+median(uvals)
+var(uvals)
+sd(uvals)
+skewness(uvals)
+kurtosis(uvals)
+
+```
+
+# The Gaussian Distribution
+
+aka "normal", "bell curve"
+
+-symmetric about the mean
+-width described well by the standard deviation
+
+-Mathematically derived as a approximation for any symmetric distribution with
+a strong central peak at the mean
+
+-Useful for variables where many other variables determine the outcome
+    -human heights and weights, other biological responses
+    -averages of composite variables
+  
+-Often used when we don't know what else to do
+
+
+```{R}
+nvals=rnorm(1000,3.5,1)
+hist(nvals)
+```
+
+
+```{R}
+
+
+mean(nvals)
+median(nvals)
+var(nvals)
+sd(nvals)
+skewness(nvals)
+kurtosis(nvals)
+
+```
+# Exponential distributions
+
+Used when the number of instances decays exponential relative to the starting
+value.
+
+It has a long positive or right tail,    meaning a few cases at very high values 
+and less at low values
+
+-Many economic variables show this type of trend,   bank account balances,  house prices
+   family net income,    many values below the mean,   less above, but very large values 
+  above the mean
+
+```{R}
+evals=rexp(1000,1)
+hist(evals)
+
+```
+
+```{R}
+
+mean(evals)
+median(evals)
+var(evals)
+sd(evals)
+skewness(evals)
+kurtosis(evals)
+```
+
+# Weibull
+
+The Weibull distribution can take on many shapes, depending on the parameter 
+values chosen
+
+```{R}
+wvals=rweibull(1000,6,4.5)
+hist(wvals)
+
+```
+
+```{R}
+
+mean(wvals)
+median(wvals)
+var(wvals)
+sd(wvals)
+skewness(wvals)
+kurtosis(wvals)
+```
+
+
+# Putting our data into a Data Frame
+
+This will allow for easier plotting
+
+We want to use ggplot for high quality plots with a lot of formatting options
+
+ggplot requires that the data be in a data frame.  So we will put our four sets
+of simulated data into a dataframe
+
+```{R}
+distrib_df=data.frame(uniform=uvals, normal=nvals,exponential=evals, weibull=wvals)
+
+```
+
+Check on the data frame, to see if it is what we meant to create
+
+our tools to do this are head(), str() and summary()
+
+```{R}
+head(distrib_df)
+```
+
+```{R}
+str(distrib_df)
+```
+Summary shows us a lot of measures
+
+Notice we get the mean, median and range (min, max)
+and also the 1st quartile (the value at which 25% is less that the quartile)
+and the 3rd quartile (where 25% are greater than this point)
+
+"Quartile" refers to spliting data up into 4 groups, with boundaries at the 1st 
+quartile (25%), the 2nd or median (50%) and the 3rd quartile (75%)
+
+Quartile is one form of a "quantile".  Quantiles can be at any percentage, 5%,10%
+90%, 95%, 99% etc
+
+```{R}
+summary(distrib_df)
+```
+So summary gives us a lot of information about the 4 univariate distributions
+currently in our data frame
+
+There is a fancier version of summary in the package called skimr
+
+Here's what it looks like
+
+```{r}
+library('skimr')
+skim(distrib_df)
+```
+
+Using summary() or skim() is a quick way to get many of the "standard" descriptive
+statistics
+
+It is probably safe to say you should always use both head() and summary() on 
+a data set you haven't seen before.
+
+
+# Plotting with GGPlot
+
+# Histograms
+
+In ggplot, data must always be in a data frame to plot it
+
+the aes() section specifies which data from the data frame should be used for
+the x and y axes on a plot and for coloring and setting symbols
+
+We will look at some ggplots for the uniform distribution
+
+Note, I say ggplot, but the package is named ggplot2
+
+the term +geom_histogram adds an "item" to the plot, in this case a histogram
+
+ggtitle- adds a title
+
+```{R}
+library('ggplot2')
+ggplot(distrib_df, aes(x=uniform))+geom_histogram()+ggtitle('Uniform Distribution')
+```
+
+# *Question/Action*
+
+Cut and paste to create a ggplot histogram of the normal or Gaussian data
+
+Remember to change the title
+
+```{r}
+ggplot(distrib_df, aes(x=normal))+geom_histogram()+ggtitle('Gaussian Distribution')
+```
+
+What is very different about the normal or gaussian relative to the Uniform?  Are both symmetric?
+
+*The Gaussian Distribution forms a bell curve, where a majority of the values fall on or near the mean, and exponentially decreases as the value moves away from the mean. They are both symmetric about the mean.*
+
+# BoxPlot
+
+This is a super handy plot,  it shows a box that is the 25%-75% quartile, with
+whiskers representing the 5% lower and 95% upper quantiles
+
+"Outliers" or extreme values are shown as dots
+
+https://en.wikipedia.org/wiki/Box_plot
+
+
+Notice- I just cut and pasted and changed to geom_boxplot
+        also the data is now y=uniform to make the plot vertical
+
+```{R}
+library('ggplot2')
+ggplot(distrib_df, aes(y=uniform))+geom_boxplot()+ggtitle('Uniform Distribution')
+```
+# *Question/Action*
+
+Create a box plot for some other of the 4 distributions, label it,  produce both 
+vertical (y=) and horizontal (x=) versions of it
+
+Discuss how the other distributions look different from the uniform when we display them
+with a boxplot
+
+```{r}
+ggplot(distrib_df, aes(x="",y=normal))+geom_boxplot()+ggtitle('Normal Distribution Vertical')
+ggplot(distrib_df, aes(x=normal,y=""))+geom_boxplot()+ggtitle('Normal Distribution Horizontal')
+ggplot(distrib_df, aes(x="",y=weibull))+geom_boxplot()+ggtitle('Weibull Distribution Vertical')
+ggplot(distrib_df, aes(x=weibull,y=""))+geom_boxplot()+ggtitle('Weibull Distribution Horizontal')
+```
+*The normal distribution has outliers on either side of the IQR, and the Weibull has outliers on one side of the IQR. These both differ from the normal dustribution, which does not feature any outliers and the IQR is evenly distributed. The IQR for the weibull and normal distributions are contracted compared to the uniform distribution.*
+
+# Adding data points to the plot
+
+We can plot the density of points on top of the box, so we can see the pattern of
+points along the y axis
+
+The points are "jittered" along the x axis with width =0.3 to wide the plot of points
+
+```{R}
+
+ggplot(distrib_df, aes(x="",y=uniform))+geom_boxplot()+ggtitle('Uniform Distribution')+geom_rug(sides='1')+geom_jitter(width=0.3, height=0,col="red")
+```
+
+# *Question/Action*
+
+Repeat this for your favorite distribution
+
+```{r}
+ggplot(distrib_df, aes(x="",y=normal))+geom_boxplot()+ggtitle('Normal Distribution')+geom_rug(sides='1')+geom_jitter(width=0.3, height=0,col="red")
+```
+
+
+# Violin plot
+
+In this plot the width of the outline indicates the number of points present
+
+```{R}
+
+ggplot(distrib_df, aes(x="",y=uniform))+geom_violin()+ggtitle('Uniform Distribution')+geom_rug(sides='1')+geom_jitter(width=0.3, height=0,col="red")
+```
+
+```{R}
+
+ggplot(distrib_df, aes(x="",y=normal))+geom_violin()+ggtitle('Normal Distribution')+geom_rug(sides='1')+geom_jitter(width=0.3, height=0,col="red")
+```
+
+# *Question/Action*
+
+Why does this violin shape change so much from Uniform to normal?
+
+*The violin plot is a visualization of distribution density over the observation range. For a uniform distribution, the density should be, well, uniform, therefore the violin plot should be roughly square (depending on the random variation). A normal distribution has a much higher observation count density near the mean, tapering off to the ends of the distribution. The violin plot for the normal distribution ends up making a mirrored bell curve about the x-axis.*
+
+What feature of the violin plot can tell you about skew?
+
+*Skew can be determined by observing the width/length of the violin plot edges. A higher skew would indicate a larger tail length/width.*
+
+Predict what the violin plot of the exponential data will look like, then plot
+it.
+
+![Exponential Violin Plot](.\assets\exp_violin.png)
+
+```{r}
+ggplot(distrib_df, aes(x="",y=exponential))+geom_violin()+ggtitle('Exponential Distribution')+geom_rug(sides='1')+geom_jitter(width=0.3, height=0,col="red")
+```
+
+*Oops! Inverted... My mistake was that there should be more densely populated values at the low end of the distribution, because the points get exponentially less dense over the range of y.*
+
+# DotPlot
+
+Shows a histogram as stacked dots
+
+Really just another histogram
+
+```{R}
+ggplot(distrib_df, aes(x=normal))+geom_dotplot(dotsize=0.15)+ggtitle('Normal Distribution')
+```
+
+# Density estimate
+
+This is the estimated density of points, shown as a curve on a histogram
+
+Essentially a curve fitted to the histogram
+
+```{R}
+ggplot(distrib_df, aes(x=normal))+geom_density()+ggtitle('Normal Distribution')
+```
+
+# Histogram with a density estimate
+
+Histogram with a fitted curve
+
+The "rug" plot only the bottom shows the density of values at each point along
+the axis
+
+This is sometimes called a marginal density or marginal distribution plot
+
+```{R}
+ggplot(distrib_df, aes(x=normal))+geom_histogram(aes(y = ..density..),
+                 colour = 1, fill = "white")+ggtitle('Normal Distribution')+geom_density()+geom_rug()
+```
+
+
+# Biplots or scatter plots
+
+Allow us to see the relationships between two variables
+
+Our random values are not good for this, but let's try anyway, just 
+to see how the plot works
+
+geom_point() plots x and y 
+
+There is no relationship between the x and y axes used here, the result is
+just a featureless blob-  this is evidence of a lack of a relationship between 
+these two random variables
+
+```{R}
+ggplot(distrib_df, aes(y=uniform, x=normal))+geom_point()
+```
+# Data on human height and weight
+
+We would expect some structure or relationship between height and weight (why?)
+
+*Typically, assuming a non-obese data set, taller people have a larger volume, therefore weigh more because the density of the human body is relatively consistent.*
+
+```{R}
+data(women)
+
+ggplot(women,aes(x=weight, y=height))+geom_point()
+```
+
+Turns out in this limited data set, the relationship is very strong
+
+# *Question/Action*
+
+Do an exploratory data analysis on the univariate values height and weight in 
+the data set women
+
+## Weight Analysis
+
+```{r}
+mean(women$weight)
+median(women$weight)
+var(women$weight)
+sd(women$weight)
+skewness(women$weight)
+kurtosis(women$weight)
+```
+
+```{r}
+ggplot(women, aes(x=weight))+geom_histogram()+ggtitle('Weight Histogram')
+ggplot(women, aes(x="",y=weight))+geom_boxplot()+ggtitle('Weight Boxplot')+geom_rug(sides='1')+geom_jitter(width=0.3, height=0,col="red")
+ggplot(women, aes(x="",y=weight))+geom_violin()+ggtitle('Weight Violin Plot')+geom_rug(sides='1')+geom_jitter(width=0.3, height=0,col="red")
+```
+
+## Height Analysis
+
+```{r}
+mean(women$height)
+median(women$height)
+var(women$height)
+sd(women$height)
+skewness(women$height)
+kurtosis(women$height)
+```
+
+```{r}
+ggplot(women, aes(x=height))+geom_histogram()+ggtitle('Height Histogram')
+ggplot(women, aes(x="",y=height))+geom_boxplot()+ggtitle('Height Boxplot')+geom_rug(sides='1')+geom_jitter(width=0.3, height=0,col="red")
+ggplot(women, aes(x="",y=height))+geom_violin()+ggtitle('Height Violin Plot')+geom_rug(sides='1')+geom_jitter(width=0.3, height=0,col="red")
+```
+
+Use whatever tools and plots seem useful- try to use them all in fact
+
+This is a small data set, so the results will not look "perfect"
+
+What is the central tendency?- find several measures
+
+*The tendency for the height data is almost perfect uniformity, based on the violin plots, skewness, and kurtosis. Weight, however, is more of a weibull distribution, using the same metrics.*
+
+Find 3 measures of spread
+
+*Skewness, kurtosis, and standard deviation are the three measures of spread. These values for each data set can be seen, below:*
+
+Weight
+[1] 15.49869
+[1] 0.2524665
+[1] 1.900217
+
+
+Height
+[1] 4.472136
+[1] 0
+[1] 1.789286
+
+What is the kurtosis?  is this data skewed?  provide two forms of evidence of
+this
+
+*Based on the weight and height numerical analysis, above, the kurtosis is 1.9 and 1.79 for weight and height, respectively. The data is not skewed based on the skewness values (0 and 0.25) and the boxplots for both data sets.*
+
+If you had to pick one of the 4 distributions we have seen to describe the height and 
+weight data,  which would you use?  Would you use the same for both?  Why is the distribution you 
+picked the best choice in each case? 
+
+*I would use uniform for height and Weibull for weight. Uniform is fit for height because it has a very low kurtosis and zero skew. Weight fits the Weibull distribution becase it has a slightly higher kurtosis, non-zero skew, and the violin plot is suggestive of Weibull.*
+

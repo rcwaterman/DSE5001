@@ -1,0 +1,335 @@
+---
+title: "Pair Programming Module 06 Classic Hypothesis Tests"
+author: "HDS"
+date: "2024-08-30"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Pair Programming Exercise 6  DSE5001
+
+## Hypothesis tests based on Algebraic Tests
+
+These are "classic" tests of various hypotheses.  We can't cover them all in 
+depth this semester, but we can survey them.  These ideas crop up repeatedly 
+throughout data science, so we need to be aware of them.
+
+Most of these tests are about comparisons between groups.
+
+We will use the mtcars data set
+
+HD Sheets, August 30, 2024
+checked 01/03/2025
+
+# Student Info
+
+Your name:Ryan Waterman
+Your team-mates names: Trinity Tobin
+
+# Libraries
+
+```{R}
+library("ggplot2")
+library("dplyr")
+```
+
+# The mtcars data set
+
+This is a nice data set as there are a variety of types of cars in it.
+
+This is a set set from Motor Trend (MT) magazine from sometime in the mid 1970s,
+so it is more or less historical data
+
+```{r}
+head(mtcars)
+```
+
+# Cyl as a factor
+
+We want to think of cyl as factor, a group membership, so we will force
+it to be a factor
+
+When calling functions,  R will always treat variable as indicating group
+membership if they are of type factor, so it is worth converting all group 
+memberships as factors
+
+```{R}
+mtcars$cyl=factor(mtcars$cyl)
+
+```
+
+We will break the cars up into three categories based on the number of 
+cylinders, 4,6 or 8
+
+Use dplyrs to do this,  create separate data frames for 4,6,8 cylinder cars
+
+```{R}
+mtcars4<-mtcars %>% filter(cyl ==4)
+mtcars6<-mtcars %>% filter(cyl==6)
+mtcars8<-mtcars %>% filter(cyl==8)
+
+```
+
+
+## t-test for the Difference in the means of two groups
+
+Suppose we state the hypothesis that 6 cylinder cars on average have more power than 4 cylinder cars.   This seems a fairly common sense idea
+
+First, lets plot this, using a boxplot with color by cylinder using the whole data set
+
+```{R}
+ggplot(mtcars,aes(y=hp,x=cyl,color=cyl))+geom_boxplot()
+
+```
+
+Well, the plot looks pretty convincing, there is little or now overlap in the 
+horsepower of 4 and 6 cylinder engines
+
+# Running a formal t-test
+
+```{R}
+# we are sending in lists of hp values for 4 and 6 cylinders
+# we specify that the alternative hypothesis is "greater", meaning the first
+# variable value is hypothesized to be greater than the second
+
+t.test(x=mtcars6$hp,y=mtcars4$hp,alternative="greater")
+```
+The results show us the mean values of x (6 cylinder hp) and of y (4 cylinder hp)
+
+the observed t value was 3.5617,  or about 3.5 times the pooled standard deviation
+
+with a degree of freedom of 11.49,  the value is 0.002088,  or about a 0.2% chance
+the observed difference is due to chance
+
+# *Question/Action*
+
+Test the hypothesis that the mean weight of 8 cylinder cars is greater than the
+mean weight of 6 cylinder cars, using a t-test
+
+```{r}
+t.test(x=mtcars8$wt,y=mtcars6$wt,alternative="greater")
+```
+
+*It appears that there is a 0.09% chance that the difference in mean weight by cylinder count is due to chance.*
+
+# ANOVA,  differences among the means of more than two groups
+
+Let's look at the mean hp of the 3 cyl categories
+
+```{R}
+mtcars %>% group_by(cyl) %>% summarize(mean_hp=mean(hp))
+
+```
+
+Looks like there are meaningful difference among all three
+We can test this hypothesis using an ANOVA test
+
+We are specifying a formula here, that hp is predicted by cyl
+
+  this is written as   hp~cyl
+
+while this called an ANOVA,  it is actually a form of generalized linear model (GLM)
+
+```{R}
+results_anova= aov(hp~cyl,data=mtcars)
+summary(results_anova)
+```
+
+This test is giving us an F-statistic
+
+The F is (variance explained by grouping by cylinder)/(average error variance)
+
+F values are always ratios of variances,   high F means the grouping explains
+a lot of differences in the data relative to the random fluctuation in the 
+data
+
+The p-value of an F ratio depends on the degrees of Freedom (DF),  the DF for
+a factor is one less than the number of groups,   so we have 3 groups and the 
+DF is 2
+
+Typically F values over about 2 are meaningful, at reasonable sample sizes.
+
+Here the p-value is very low, indicating no meaningful chance the variation in
+hp is unrelated to the number of cylinders
+
+# *Question/Action*
+
+Determine if the differences in mean weights among 4,6 and 8 cylinder carries
+is related to the cylinder category,  using an ANOVA as above
+
+```{r}
+results_anova= aov(wt~cyl,data=mtcars)
+summary(results_anova)
+```
+
+
+## Tests of Counts in Categories
+
+Contingency tables and Contingency tests (Chi-square)
+
+The mtcar data set has a category for automatic or manual transmission.  the 
+variable am = 0 for automatics and am=1 for manual
+
+We can force am to be a factor and also set the labels names as "auto" and "manual"
+
+```{R}
+mtcars$am=factor(mtcars$am,labels=c("auto","manual"))
+head(mtcars)
+```
+# Contingency table
+
+Let's look at the counts of transmission type per cylinder, this is 
+contingency table
+
+```{R}
+
+mtcars %>% group_by(cyl,am) %>% summarize(n=n())
+
+```
+
+We could also use the R function table to show the counts in each category
+
+This is sometimes called a contingency table
+
+
+```{R}
+con_table=table(mtcars$cyl,mtcars$am)
+con_table
+```
+We can get the sums over rows and columns
+
+```{R}
+library("MASS")
+
+addmargins(con_table)
+```
+The Null hypothesis we might state is that the number of manual vs automatic transmissions
+is independent of the number of cylinders.  As we can see in the table, that doesn't
+look to be true, but the predominance of manual transmissions in 4 cylinder cares might just
+be chance
+
+The *Chi-squared test* is a test against the hypothesis of equal ratios in each cell
+of the contingency table,  
+
+Notice that we have to feed data into the test as a contingency table
+
+```{R}
+chisq.test(con_table)
+```
+The Chi-squared value is the sum of the squared departures from the expected count
+in each cell, if the cells are randomly distributed among auto and manual
+
+A large Chi-square is unlikely, the p value is determined by the df in the system
+
+The df is (number of rows-1)*(number of columns-1)
+
+This p value is low, so the chance of transmission type not being related to 
+the number of cylinders is very low
+
+
+The *Fisher exact test* is an alternative to the Chi-Square
+
+We got a warning that the Chi-Square might not be a correct approximation,  the 
+Chi-Square can fail at small sample sizes.
+
+The Fisher exact test is more reliable,but hard to calculate at large sample 
+sizes, so it is best suited to small sample sizes where the Chi-square is likely
+to fail
+
+```{r}
+fisher.test(con_table)
+
+```
+
+The Fisher exact test returned a lower p-value than the Chi-squared, but the 
+implication is the same.
+
+## *Question/Action*
+
+Create a contingency table for cylinders and gears.  
+
+You will need to convert gears to a factor,   you don't need labels for the gears
+though, the numbers are fine.
+
+Show the table and then run the Chi-square and Fisher exact test.
+
+Explain what it means.
+
+```{r}
+mtcar_factor<- mtcars %>% mutate(gear_factor = as.factor(gear))
+
+con_table_cg=table(mtcar_factor$cyl,mtcar_factor$gear_factor)
+con_table_cg
+
+```
+
+```{r}
+
+chisq.test(con_table)
+```
+
+```{r}
+fisher.test(con_table)
+
+```
+
+*The chi-squared test indicates a relationship between the number of factors and gears, as does the fisher test. Each result in a low p-value.*
+
+# F test for equality of variance
+
+In some tests, there is an assumption of equal variance among groups.  We may need to test this, or differences in variance may be our hypothesis
+
+High variance in manufactured parts is a bad thing, so we may be looking to see if one set of parts had lower variance than another, as an example.
+
+We can test to see if our three groups of cars by cylinder have equal variance in mpg
+
+```{R}
+mtcars %>% group_by(cyl) %>% summarise("Variance"=var(mpg))
+
+```
+Wow, sure looks like a no on that one!
+
+In the 1970s, there were some really poor 4 cylinder engines
+
+Here's the test
+
+We can only compare two groups, so we'll compare 4 and 6, omitting 8
+
+```{R}
+mtcars46=mtcars[mtcars$cyl!=8,]
+
+```
+
+we have the formula mpg predicted by cyl, but we are testing variances, not means
+
+In the var test we can only have two groups, so i used cyl==4, to compare
+4 cylinders vs 6s an d8s
+
+```{R}
+var.test(mpg~cyl, data=mtcars46)
+```
+F is a ratio of variances, so high F means inequality
+
+the p value depends on both df values,  here p=0.01182 for the null, so we
+can reject the null
+
+# *Question/Action*
+
+Run an F-test for equality of variance on 6 cylinder vs 8 cylinder cars
+
+```{R}
+mtcars %>% group_by(cyl) %>% summarise("Variance"=var(mpg))
+
+```
+
+```{R}
+mtcars68=mtcars[mtcars$cyl!=4,]
+
+```
+
+```{R}
+var.test(mpg~cyl, data=mtcars68)
+```

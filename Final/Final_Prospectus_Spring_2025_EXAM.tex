@@ -1,0 +1,447 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+]{article}
+\usepackage{amsmath,amssymb}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math} % this also loads fontspec
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+\usepackage{lmodern}
+\ifPDFTeX\else
+  % xetex/luatex font selection
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\usepackage[margin=1in]{geometry}
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\usepackage{graphicx}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+% Set default figure placement to htbp
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\ifLuaTeX
+  \usepackage{selnolig}  % disable illegal ligatures
+\fi
+\usepackage{bookmark}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same}
+\hypersetup{
+  pdftitle={Final Exam Prospectus},
+  pdfauthor={HD Sheets},
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+
+\title{Final Exam Prospectus}
+\author{HD Sheets}
+\date{2024-10-07}
+
+\begin{document}
+\maketitle
+
+\subsection{Final Exam Prospectus}\label{final-exam-prospectus}
+
+Prep for the exam by making sure you can do all these problems, and that
+you understand the content of each data set.
+
+You may want to do some research on your own to understand these data
+sets a bit, and to be sure you understand the ideas in each problem.
+
+Prepare an RMD with answers to all of these problems. You may use the
+RMD and other sources of information during the exam. You can look
+things up during the exam, but you cannot asking questions of another
+living person, or of LLM models like ChatGPT or Claude.
+
+Turn in your prepared RMD with all answers prepared and annotated at the
+start of the exam. The preparation is 40\% of the exam grade.
+
+Then you will get 3 randomly chosen questions from this set of questions
+to answer on the exam during the one-hour exam window. The exam will be
+60\% of the grade.
+
+Note-If you have a problem wrong on the preparation section, that will
+cause you to lose more points on the in-class exam as well, just be
+aware of that and be sure you understand the preparation material.
+
+The questions during the live exam will be modified, so while you can
+(and should) cut and paste answers from your preparation RMD, you will
+need to modify your answers to reflect the changes in the exam question
+
+I might alter the exam question by
+
+a.) changing the data set b.) changing what variables I want to see
+plotted, or in a table c.) changing ranges of values
+
+I will use the Quiz function in Canvas to randomly give you three
+problems, cut and paste these into an RMD and then use your prepared
+code to answer them. You can just paste the altered problems right into
+your prepared RMD if that helps.
+
+I will answer questions about the problem statements, but will not tell
+you if you have a problem correct or not.
+
+Most of the questions are derived from homework and/or PairProgrammming
+examples from Modules 5 to 7, but earlier material may be included
+
+Module 8 content is not covered on this exam.
+
+This exam thus has a ``take home preparation'' portion and a ``live''
+portion. Due to the sheer volume of material in the class and the rapid
+pace, this format will reward extensive preparation work, and lower the
+impact of work during the one hour exam window. At the same time, you do
+have to be able to execute the code quickly, demonstrating that you
+understand how it works.
+
+\section{Exam Time}\label{exam-time}
+
+The exam will open at 5 pm EST October 17 and close at 9pm October 18,
+you must complete the exam in a one-hour long block within that time
+frame
+
+Note: I have be available on Zoom from 7 to 9 pm EST on Thursday Oct 17
+and 7-9 pm EST on Friday Oct 18, so that you can jump on zoom if you
+have to ask me questions. I strongly urge you to take the exam during
+one of the times when I am online. I cannot guarantee you will be able
+to ask me questions at other times during the exam window. If you feel
+you will want to be able to ask questions, try to plan on taking the
+exam between 7-9 pm EST on Thursday or Friday.
+
+\section{Problem 1 EXAM}\label{problem-1-exam}
+
+\begin{verbatim}
+                       Health Status
+\end{verbatim}
+
+Health Excellent Very Good Good Fair Poor Total Coverage No 456 727 854
+385 99 2,521 Yes 4,201 6,246 4,820 1,634 578 17,479 Total 4,657 6,973
+5,674 2,019 677 20,000
+
+a.) What is the probability that a single individual drawn at random has
+poor health and does not have Health Insurance? What would be the
+standard error on this estimate of a proportion?
+
+\emph{This cohort represents 99 of the 20000 subjects.}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{n}\OtherTok{=}\DecValTok{20000}
+\NormalTok{p}\OtherTok{=}\DecValTok{99}\SpecialCharTok{/}\NormalTok{n}
+\NormalTok{p}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 0.00495
+\end{verbatim}
+
+\emph{The probability is about 0.495\%}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{SE}\OtherTok{=}\NormalTok{((p}\SpecialCharTok{*}\NormalTok{(}\DecValTok{1}\SpecialCharTok{{-}}\NormalTok{p))}\SpecialCharTok{/}\NormalTok{n)}\SpecialCharTok{\^{}}\FloatTok{0.5}
+\NormalTok{SE}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 0.0004962609
+\end{verbatim}
+
+\emph{The standard error is about 0.0005}
+
+b.) What is the probability of having Poor health overall?
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\DecValTok{677}\SpecialCharTok{/}\DecValTok{20000}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 0.03385
+\end{verbatim}
+
+\emph{About 3.4\%}
+
+c.) what is the probability of not having health coverage?
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\DecValTok{2521}\SpecialCharTok{/}\DecValTok{20000}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 0.12605
+\end{verbatim}
+
+\emph{About 12.6\%}
+
+d.) What is the probability of having poor health given that a person
+has health coverage?
+
+\emph{P(PO \textbar{} HC) = P(PO and HC)/P(HC)}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{P\_hc}\OtherTok{=}\DecValTok{17479}\SpecialCharTok{/}\DecValTok{20000}
+\NormalTok{P\_po\_and\_hc}\OtherTok{=}\DecValTok{578}\SpecialCharTok{/}\DecValTok{20000}
+\NormalTok{P\_po\_given\_hc }\OtherTok{=}\NormalTok{ P\_po\_and\_hc}\SpecialCharTok{/}\NormalTok{P\_hc}
+\NormalTok{P\_po\_given\_hc}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 0.03306825
+\end{verbatim}
+
+\emph{About 3.3\%}
+
+e.) Are having poor health and having health coverage independent?
+
+\emph{To determine this, let's look at the proportion of people without
+health coverage at each health level. If these variables were mutually
+exclusive, I would expect there to be a dramatically smaller proportion
+of people with excellent health and no health coverage.}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{excellent}\OtherTok{=}\DecValTok{456}\SpecialCharTok{/}\DecValTok{4657}
+\NormalTok{very\_good}\OtherTok{=}\DecValTok{727}\SpecialCharTok{/}\DecValTok{6973}
+\NormalTok{good}\OtherTok{=}\DecValTok{854}\SpecialCharTok{/}\DecValTok{5674}
+\NormalTok{fair}\OtherTok{=}\DecValTok{385}\SpecialCharTok{/}\DecValTok{2019}
+\NormalTok{poor}\OtherTok{=}\DecValTok{99}\SpecialCharTok{/}\DecValTok{677}
+
+\FunctionTok{cat}\NormalTok{(}\StringTok{"Excellent Proportion: "}\NormalTok{, }\FunctionTok{round}\NormalTok{(excellent}\SpecialCharTok{*}\DecValTok{100}\NormalTok{,}\DecValTok{2}\NormalTok{),}\StringTok{"\%}\SpecialCharTok{\textbackslash{}n}\StringTok{"}\NormalTok{, }
+    \StringTok{"Very Good Proportion: "}\NormalTok{, }\FunctionTok{round}\NormalTok{(very\_good}\SpecialCharTok{*}\DecValTok{100}\NormalTok{,}\DecValTok{2}\NormalTok{),}\StringTok{"\%}\SpecialCharTok{\textbackslash{}n}\StringTok{"}\NormalTok{,}
+    \StringTok{"Good Proportion: "}\NormalTok{, }\FunctionTok{round}\NormalTok{(good}\SpecialCharTok{*}\DecValTok{100}\NormalTok{,}\DecValTok{2}\NormalTok{),}\StringTok{"\%}\SpecialCharTok{\textbackslash{}n}\StringTok{"}\NormalTok{,}
+    \StringTok{"Fair Proportion: "}\NormalTok{, }\FunctionTok{round}\NormalTok{(fair}\SpecialCharTok{*}\DecValTok{100}\NormalTok{,}\DecValTok{2}\NormalTok{),}\StringTok{"\%}\SpecialCharTok{\textbackslash{}n}\StringTok{"}\NormalTok{,}
+    \StringTok{"Poor Proportion: "}\NormalTok{, }\FunctionTok{round}\NormalTok{(poor}\SpecialCharTok{*}\DecValTok{100}\NormalTok{,}\DecValTok{2}\NormalTok{),}\StringTok{"\%}\SpecialCharTok{\textbackslash{}n}\StringTok{"}\NormalTok{,}
+    \AttributeTok{sep=}\StringTok{""}
+\NormalTok{    )}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Excellent Proportion: 9.79%
+## Very Good Proportion: 10.43%
+## Good Proportion: 15.05%
+## Fair Proportion: 19.07%
+## Poor Proportion: 14.62%
+\end{verbatim}
+
+\emph{It appears that having poor health and health care could be
+independent, as there is a relatively uniform, maybe even slightly
+normal distribution, of health proportions by coverage status. The poor
+proportion represents about the same proportion as the good health
+category, and is only about 5\% different from the remaining
+proportions.}
+
+\section{Problem 2 EXAM}\label{problem-2-exam}
+
+Written answers.
+
+Suppose we have the following situations
+
+2.1.) I wish my friend a happy birthday, but it is not her birthday.
+
+2.2.) I forget to wish my friend a happy birthday on her birthday.
+
+a.) Which of 2.1 and 2.2 is a false positive?
+
+\emph{2.1 is a false positive.}
+
+b.) Which of 2.1 and 2.2 is a false negative?
+
+\emph{2.2 is a false negative}
+
+c.) Which of the two errors is more of concern? What is the ``cost'' of
+each mistake.
+
+\emph{This depends on whether the critical result is positive or
+negative. Let's assume that a positive is an instance of a failure. In
+this case, false positives can arise from an abundance of caution, which
+is often preferable in most real world scenarios. False negatives,
+however, would be very dangerous in this scenario, as they would be a
+failure that was not identified, and could reach the customer, which
+could tarnish reputation. In the opposite case, if a pass is a positive,
+the false positive would be the more dangerous error.}
+
+If we are running a test of a new marketing campaign, of adds A and B.
+We decide we want a significance level of 2.5\% for our sample size of
+60 people in each group.
+
+d.) Are we likely to make a Type 1 error?
+
+\emph{A type 1 error occurs when the null hypothesis is rejected when it
+is true. A 2.5\% significance level means there is a 2.5\% chance that
+the null hypothesis has been rejected when it is true, or there is a
+2.5\% chance of a type 1 error, making it unlikely.}
+
+e.) Are we likely to make a Type 2 error?
+
+\emph{A type 2 error is more likely than type 1, as the type 2 error
+happens when the null hypothesis is accepted, even if there is a
+measurable effect. Increasing the significance level reduces the risk of
+type 1 error, but proportionally increases the risk of type 2 error.}
+
+f.) What two options are there to reducing the Type 2 error? What are
+the drawbacks of each of these approaches.
+
+Source:
+\url{https://corporatefinanceinstitute.com/resources/data-science/type-ii-error/\#}:\textasciitilde:text=1.,the\%20power\%20of\%20a\%20test.
+
+\emph{Option 1: Reduce the significance level, which could lead to more
+type 1 errors.} \emph{Option 2: Increase the sample size. This increases
+the ability to detect differences in the hypothesis test. This could
+lead to false conclusions, as small effects are more significant.}
+
+\section{Problem 6 EXAM}\label{problem-6-exam}
+
+Load the data set ``iris'' from the r datasets, it is a standard data
+set.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{data}\NormalTok{(iris)}
+\FunctionTok{head}\NormalTok{(iris)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##   Sepal.Length Sepal.Width Petal.Length Petal.Width Species
+## 1          5.1         3.5          1.4         0.2  setosa
+## 2          4.9         3.0          1.4         0.2  setosa
+## 3          4.7         3.2          1.3         0.2  setosa
+## 4          4.6         3.1          1.5         0.2  setosa
+## 5          5.0         3.6          1.4         0.2  setosa
+## 6          5.4         3.9          1.7         0.4  setosa
+\end{verbatim}
+
+a.) What test would you use to test the hypothesis that the Sepal.Width
+was more variable in setosa than in versicola?
+
+\emph{An F-test would be used.}
+
+b.) Run this test in R. Did the hypothesis hold?
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{var.test}\NormalTok{(iris[iris}\SpecialCharTok{$}\NormalTok{Species}\SpecialCharTok{==}\StringTok{"setosa"}\NormalTok{, }\DecValTok{2}\NormalTok{], iris[iris}\SpecialCharTok{$}\NormalTok{Species}\SpecialCharTok{==}\StringTok{"versicolor"}\NormalTok{, }\DecValTok{2}\NormalTok{])}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+##  F test to compare two variances
+## 
+## data:  iris[iris$Species == "setosa", 2] and iris[iris$Species == "versicolor", 2]
+## F = 1.4592, num df = 49, denom df = 49, p-value = 0.1895
+## alternative hypothesis: true ratio of variances is not equal to 1
+## 95 percent confidence interval:
+##  0.828080 2.571444
+## sample estimates:
+## ratio of variances 
+##           1.459233
+\end{verbatim}
+
+\emph{The p-value is greater than 0.05, therefore we cannot reject the
+null hypothesis, implying the hypothesis does not hold.}
+
+c.) Does the species variable predict differences in Petal.Width? What
+test would you use to test this hypothesis?
+
+\emph{An ANOVA test would be used to test this hypothesis.}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{summary}\NormalTok{(}\FunctionTok{aov}\NormalTok{(Petal.Width }\SpecialCharTok{\textasciitilde{}}\NormalTok{ Species, iris))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##              Df Sum Sq Mean Sq F value Pr(>F)    
+## Species       2  80.41   40.21     960 <2e-16 ***
+## Residuals   147   6.16    0.04                   
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+\end{verbatim}
+
+\emph{The species variable strongly predicts differences in Petal.Width.
+This is indicated by the near 0 p-value, rejecting the null hypothesis.}
+
+\end{document}

@@ -1,0 +1,237 @@
+---
+title: "HW_LAB05"
+author: "Ryan Waterman"
+date: "2025-02-05"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Homework\Lab 5
+
+## 3.22 Exit poll. 
+
+> Edison Research gathered exit poll results from several sources for the Wisconsin recall election of Scott Walker. They found that 53% of the respondents voted in favor of Scott Walker. Additionally, they estimated that of those who did vote in favor for Scott Walker, 37% had a college degree, while 44% of those who voted against Scott Walker had a college degree.  
+
+### Suppose we randomly sampled a person who participated in the exit poll and found that he had a college degree. What is the probability that he voted in favor of Scott Walker?
+
+*This is a multiplicative operation: P(favor) = P(Overall_Percent_In_Favor) x P(College_Degree_In_Favor) = 0.53 x 0.37 = 19.61%*
+
+## 3.24 Socks in a drawer. 
+
+>In your sock drawer you have 4 blue, 5 gray, and 3 black socks. Half asleep one morning you grab 2 socks at random and put them on. Find the probability you end up wearing
+
+### (a) 2 blue socks
+
+*After picking one sock, the probability of picking another has changed because there is one fewer in the pool.*
+
+```{r}
+P_first_sock=4/(4+5+3)
+P_second_sock=3/(3+5+3)
+P_two_blue=P_first_sock*P_second_sock
+P_two_blue
+```
+*About 9.1%*
+
+### (b) no gray socks
+
+*The probability of not picking any gray socks is the probability of picking only blue or black socks.*
+
+```{r}
+P_first_sock=(4+5)/(4+5+3)
+P_second_sock=(3+5)/(3+5+3)
+P_no_gray=P_first_sock*P_second_sock
+P_no_gray
+```
+*About 54.5%*
+
+### (c) at least 1 black sock
+
+*At least one black sock is 1-P(no black sock)*
+
+```{r}
+P_first_sock=(4+5)/(4+5+3)
+P_second_sock=(3+5)/(3+5+3)
+P_at_least_one_black=1-(P_first_sock*P_second_sock)
+P_at_least_one_black
+```
+*About 45.5%*
+
+### (d) a green sock
+
+*There are no green socks, therefore the probability is 0%*
+
+### (e) matching socks
+
+*These will each need to be calculated individually, then summed.*
+
+```{r}
+P_blue_match=(4/12)*(3/11)
+P_gray_match=(5/12)*(4/11)
+P_black_match=(3/12)*(2/11)
+P_matching=P_blue_match+P_gray_match+P_black_match
+P_matching
+```
+*About 28.8%*
+
+## 3.26 Books on a bookshelf. 
+
+>The table below shows the distribution of books on a bookcase based on whether they are nonfiction or fiction and hardcover or paperback.
+
+![image](.\assets\table.png)
+
+### (a) Find the probability of drawing a hardcover book first then a paperback fiction book second when drawing without replacement.
+
+*This looks like it is going to need a tree diagram... Trust me, I drew one.*
+
+```{r}
+#First, get P_hardcover
+P_hardcover=28/95
+P_hardcover
+
+#Next, compute P_paperback with the missing book
+P_paperback=67/94
+P_paperback
+
+#Now, compute the probability that the paperback book is a fiction book
+P_paperback_fiction=59/67
+P_paperback_fiction
+
+#Now multiply the probabilities together to get the cumulative probability
+P_cumulative=P_hardcover*P_paperback*P_paperback_fiction
+P_cumulative
+```
+*About 18.5%*
+
+### (b) Determine the probability of drawing a fiction book first and then a hardcover book second, when drawing without replacement.
+
+*This is a conditional probability because the factors are dependent on each other.*
+
+*We are not replacing the book, therefore we need to break this into two cases, one where the fiction was hardcover and one where it was paperback.*
+
+```{r}
+#Step one, determine the probability of a hardcover fiction draw
+P_hard_fic=13/95
+print("CASE 1: P(Hardcover|Hardcover Fiction)")
+paste0("Probability of hardcover fiction: ", P_hard_fic)
+
+#Step two, determine the probability that the second book is a hardcover given the first being a hardcover fiction. We will now only have 27 hardcover books and 94 books total.
+P_hard_given_hard_fic=27/94
+paste0("Probability of hardcover given hardcover fiction: ", P_hard_given_hard_fic)
+
+#Get the probability for case 1
+P_case_1= P_hard_fic*P_hard_given_hard_fic
+paste0("Probability of case 1: ", P_case_1)
+cat('\n')
+
+#Now, repeat for case two, where the first book was a fiction paperback
+#Step one, determine the probability of a paperback fiction draw
+P_paper_fic=59/95
+print("CASE 2: P(Hardcover|Paperback Fiction)")
+paste0("Probability of a paperback fiction: ", P_paper_fic)
+
+#Step two, determine the probability that the second book is a hardcover given the first being a paperback fiction. We will still have 28 hardcover books and 94 books total.
+P_hard_given_paper_fic=28/94
+paste0("Probability of a hardcover given a paperback fiction: ",P_hard_given_paper_fic)
+
+#Get the probability for case 2
+P_case_2=P_paper_fic*P_hard_given_paper_fic
+paste0("Probability of case 2: ",P_case_2)
+cat('\n')
+
+#Now multiply the probabilities together to get the cumulative probability
+P_cumulative=P_case_1+P_case_2
+paste0("Cumulative Probability: ", P_cumulative)
+```
+
+*The probability is about 22.4%*
+
+### (c) Calculate the probability of the scenario in part (b), except this time complete the calculations under the scenario where the first book is placed back on the bookcase before randomly drawing the second book.
+
+*This is exactly the same as before, but the book counts won't be affected.*
+
+```{r}
+#Step one, determine the probability of a hardcover fiction draw
+P_hard_fic=13/95
+print("CASE 1: P(Hardcover|Hardcover Fiction)")
+paste0("Probability of hardcover fiction: ", P_hard_fic)
+
+#Step two, determine the probability that the second book is a hardcover given the first being a hardcover fiction. We will still have 28 hardcover books and 95 books total.
+P_hard_given_hard_fic=28/95
+paste0("Probability of hardcover given hardcover fiction: ", P_hard_given_hard_fic)
+
+#Get the probability for case 1
+P_case_1= P_hard_fic*P_hard_given_hard_fic
+paste0("Probability of case 1: ", P_case_1)
+cat('\n')
+
+#Now, repeat for case two, where the first book was a fiction paperback
+#Step one, determine the probability of a paperback fiction draw
+P_paper_fic=59/95
+print("CASE 2: P(Hardcover|Paperback Fiction)")
+paste0("Probability of a paperback fiction: ", P_paper_fic)
+
+#Step two, determine the probability that the second book is a hardcover given the first being a paperback fiction. We will still have 28 hardcover books and 95 books total.
+P_hard_given_paper_fic=28/95
+paste0("Probability of a hardcover given a paperback fiction: ",P_hard_given_paper_fic)
+
+#Get the probability for case 2
+P_case_2=P_paper_fic*P_hard_given_paper_fic
+paste0("Probability of case 2: ",P_case_2)
+cat('\n')
+
+#Now multiply the probabilities together to get the cumulative probability
+P_cumulative=P_case_1+P_case_2
+paste0("Cumulative Probability: ", P_cumulative)
+```
+
+*The probability is about 22.3%*
+
+### (d) The final answers to parts (b) and (c) are very similar. Explain why this is the case.
+
+*The similarity is a result of the sample size. Whether or not we replace the book is the difference between P_cumulative being equal to (2003/8930) in part b and (2016/9025) in part c, before reducing the fractions. If the sample of books were smaller, there would be a greater difference between the resulting probabilities.*
+
+## 3.32 Is it worth it? 
+
+>Andy is always looking for ways to make money fast. Lately, he has been trying to make money by gambling. Here is the game he is considering playing: The game costs $2 to play. He draws a card from a deck. If he gets a number card (2-10), he wins nothing. For any face card ( jack, queen or king), he wins $3. For any ace, he wins $5, and he wins an extra $20 if he draws the ace of clubs.
+
+### (a) Create a probability model and find Andy’s expected profit per game.
+
+```{r}
+#Andy has to wager 2 dollars every time, so we will track cards based on their profit
+
+card_count=52
+lose_two_dollar_cards=9*4
+one_dollar_cards=3*4
+three_dollar_cards=3
+twentythree_dollar_cards=1
+
+num_profitable = one_dollar_cards + three_dollar_cards + twentythree_dollar_cards
+odds_profitable = num_profitable/lose_two_dollar_cards
+odds_profitable
+
+```
+
+*A 44 percent profitability rate doesn't look too good... let's dive deeper.*
+
+```{r}
+#determine the expected value
+p_lose_2_dollars = lose_two_dollar_cards/card_count
+p_one_dollar = one_dollar_cards/card_count
+p_three_dollar = three_dollar_cards/card_count
+p_twentythree_dollar = twentythree_dollar_cards/card_count
+
+EV = (-2*p_lose_2_dollars)+(1*p_one_dollar)+(3*p_three_dollar)+(23*p_twentythree_dollar)
+EV
+```
+*Andy will be losing about 54 cents every time he plays, yikes.*
+
+### (b) Would you recommend this game to Andy as a good way to make money? Explain.
+
+*No, I would not recommend this game. Andy will lose 54 cents on average every time he plays, so he will eventually drain any money he has if he continuously plays.*
+
+
+
+

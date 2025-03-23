@@ -1,0 +1,56 @@
+---
+title: "Welcome to DSE5001"
+author: "HDS"
+date: "2024-08-01"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Welcome to DSE5001 and R Markdown
+
+HD Sheets, 8/1/2024,  for DSE5001
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+Markdown documents like this one have text blocks like this one we can write text in,  code blocks like the one above in grey, with the green run button in the upper right hand corner and output blocks
+
+Below is a code block that defines a string variable, name and stores the value "Dave" in the variable name.   The quotes around "Dave" indicate that it is a character string.
+
+We can then add a print statement to print out the name
+
+Clicking on the green triangle in the code cell runs the code in R and the output appears below.
+
+```{R}
+name="Ryan Waterman"
+print(name)
+```
+Notice that the variable name now appears in the code browser on the 
+upper right hand side.
+
+# Question/Action
+
+Please go into the code cell on line 27 and change the value Dave to your name, be sure it has parentheses around it.  Run the cell so it 
+prints your name.
+
+# Converting to a pdf
+
+RMD files require RStudio to view them, so that's often not convenient.
+
+We often need to" "knit" the file to convert it to pdf format
+
+Here is the set of steps we need to do this
+
+     a.) Knit the RMD file to produce a HTML document. There is a  
+     "knit" button at the top of the RMD menu bar next to the gear icon.
+
+     b.) When R shows you the HTML document, this is button at the   
+          top that says "Open in Browser"
+
+          Click this button to open the HTML file in a browser.   
+
+     c.) Use the browser print button to "Print to PDF" to produce an HTML version
+
+

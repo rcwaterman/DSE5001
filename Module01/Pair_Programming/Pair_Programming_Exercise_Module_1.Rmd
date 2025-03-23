@@ -1,0 +1,385 @@
+---
+title: "Pair Programming Exercise 1,  DSE5001"
+author: "HDS"
+date: "2024-08-06"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Pair Programming Exercise 1,  DSE5001
+
+HD Sheets, August 6, 2024
+checked 1/3/2025
+
+#Student Info
+
+Your name:Ryan Waterman
+Your team-mates names:Trinity Tobin, Nicholas Perry
+
+#Libraries
+
+*R uses libraries or packages of additional code to add more functions and abilities to
+R.   There are over 19,000 packages available* 
+
+```{R}
+library("ggplot2")
+library("tidyr")
+```
+
+# Working with built-in example data
+
+Most R packages have example "lab rat" data included for you to 
+work with and learn from (Python has this as well).
+
+This data is loaded in various formats, most of them are data frames, which are structured like an SQL "table" or an Excel "workbook"
+
+These are "flat data tables" where each column is a variable, a measurement and each row is an observation (aka an individual, or an event, or a recording).
+
+These flat data tables are the most common form of data storage you will see, other many others are possible.  We'll start here
+
+We can see the available example data sets in R using the command "data()"
+
+*This is a function call,   which we can tell because it ends with closed parenthesis ().*
+
+```{R}
+data()
+```
+
+#The Texas Housing Set
+
+This is a pretty big data set,  but we are going to have a look despite that.  It came with the ggplot2 package
+
+```{r}
+data(txhousing)
+```
+
+#Starting to learn about our data
+
+There are a bunch of R commands that help us learn about what we
+have in a data structure we aren't initially familiar with
+
+Look at these and remember them....
+
+The first thing we want to do is see what the structure of the data set is like
+
+use the str() function, and send it the name of the data
+
+```{r}
+str(txhousing)
+
+```
+
+This result tells us this is 
+
+- A data type called a "tibble" which is variant of the R dataframe.
+   You can just think of it as a data frame, it has some extra   
+   features, but is otherwise identical
+   
+- The "dimension" is [8602 x 9],  meaning it has 8602 rows and 9   
+   columns
+
+- The variables are city, year,month, sales, volume,median, listings,
+   inventory and date
+
+   City is a "chr" which means character string, or text
+   
+   Most other variables are "num", meaning real numbers, one is an
+   "int" meaning an integer
+
+We can see the help listing in R for this data using the help() function
+
+```{R}
+help("txhousing")
+```
+
+#*Question/Action 1*
+   
+There is a data set called trees,  we'll load it and then answer some questions about it
+
+```{R}
+data(trees)
+```
+
+What type of structure is this? 
+- This is a 'data.frame' structure.
+
+What are the variables within it? (ie columns)
+- Girth, height, and volume.
+
+What data types are the columns?
+- All data types are num
+
+How many rows does it have?
+- 31 rows
+
+(Add cells as needed to answer these questions)
+
+You can cut and paste the code from earlier examples!   Cut and paste is your friend, just like google is!   Bad coffee...is not your friend!  :)
+
+```{R}
+str(trees)
+help(trees)
+```
+
+#Head and Tail
+
+head() and tail() will show us just a few rows and all variables, so we
+can get a quick look at the data
+
+The default is 6 rows, but we can specify more or less
+
+Notice we can see the data types with head() or tail()
+
+```{R}
+head(txhousing)
+```
+```{R}
+tail(txhousing,8)
+```
+
+We can view the whole data set using View()
+
+```{R}
+View(txhousing)
+
+```
+
+#*Question/Action 2*
+
+Why should you get in the habit of using head() or tail() instead of view()?
+
+- Head and tail load a subset of the data that will be indicative enough of the data structure and variables to understand the dataset. Loading the whole dataset with view is computationally expensive and time consuming.
+
+
+Class() and dim() will tell us the data type and size quickly
+
+```{R}
+class(txhousing)
+```
+
+The last entry indicates this is a variation on a dataframe
+
+```{R}
+dim(txhousing)
+```
+8602 rows and 9 variables
+
+#Summary
+
+Most data types have a summary function that will tell us something about data
+
+```{R}
+summary(txhousing)
+```
+
+We can get a listing of the columns in a dataframe
+
+```{R}
+colnames(txhousing)
+```
+
+#*Question/Action 3*
+
+show the first ten entries in trees
+
+```{r}
+head(trees,10)
+```
+
+Generate the summary
+
+```{r}
+summary(trees)
+```
+
+What is mean girth (diameter) of trees in this set?
+13.25 
+
+What is the height of the smallest and shortest trees?
+```{r}
+#Height of the shortest tree can be found by the min height in the summary, or using the function below:
+min(trees["Height"])
+
+#The height of the smallest tree means the height of the tree with the lowest volume. This can be found with the function, below:
+volume_vector = as.vector(trees$Volume)
+smallest_tree <- trees$Height[match(min(trees$Volume), volume_vector)]
+smallest_tree
+```
+
+Look at the View() for trees.  Is it any more useful than head()?
+
+```{r}
+View(trees)
+```
+
+- In this specific the view function shows nearly the same amount of data as the head function, therefore it does not provide much additional value.
+
+We can access a single variable (column) of a dataframe by using the name of the dataframe followed by a dollar sign and then the name of the column
+
+So txhousing$sales is the list of all the monthly sales from the table
+
+We can feed this into functions in R to find things out, like the mean and standard deviation
+
+```{R}
+mean(txhousing$sales,na.rm=TRUE)
+```
+The line na.rm=TRUE means to remove NA values,   R uses NA to indicate missing
+data.  Some cities probably had no reported data in some months
+
+```{R}
+#computing a standard deviation- another measure of spred
+
+sd(txhousing$sales,na.rm=TRUE)
+
+```
+
+#*Question/Action 4*
+
+Find the standard deviation of the tree height variable
+
+```{r}
+sd(trees$Height, na.rm=TRUE)
+```
+
+*You may have to look up how to calculate a standard deviation in R*
+
+# Graphics
+
+#Histograms
+
+Histograms show us the distribution of values in a data set
+
+Here is a basic histogram using the built-in hist() function
+
+This plot shows the number of instances (rows) at each value of "sales"
+
+This is a "frequency distribution" or just a distribution
+
+We will talk more later about distributions
+
+```{R}
+hist(txhousing$sales,breaks=50)
+```
+
+A fancier histogram using ggplot
+
+the first item in ggplot is the name of the data frame
+
+in aes() we specify the variables to plot, and maybe to use for color coding
+
+the +geom_histogram means to use the data and variables specified in a histogram plot
+
+In ggplot, we always specify the dataframe and the aesthetic (aes) and then add other pieces to create a complex image
+
+ggplot has many, many options
+
+```{R}
+
+ggplot(txhousing,aes(x=sales))+geom_histogram(binwidth=250)
+```
+
+The sales distribution does not look  "normal" or "bell curve", or "gaussian" -   (these are all synonyms)
+
+Why would that be?
+
+```{r}
+View(txhousing)
+```
+
+- Based on the y-axis of the chart, the count of a given number of sales is the measured variable. In this case, it is reasonable to assume that smallers numbers of sales have a greater number of occurrences. Also, considering the date range of the data, there were financial factors that significantly affected the housing market, which minimize the count of large sale months (i.e. the data is skewed low).
+
+
+#*Question/Action 5*
+
+Produce both types of histograms of tree heights
+
+Does this look like a bell curve?
+
+- This data set loosely looks like a bell curve, but to be certain, a larger data set would be required.
+
+```{R}
+hist(trees$Height,breaks=10)
+ggplot(trees,aes(x=Height))+geom_histogram(binwidth=2)
+```
+
+#Box Plots
+
+These plots show
+
+-the median value (center bar)
+-the 25% and 75% quantiles, the ends of the box
+-the 5% and 95% upper and lower bounds (the "whiskers")
+-Outliers,   which are dots
+
+
+In the boxplot below,   I changed the y-scale so it is log-scaled (or "octaved"), which makes it easier to see small values
+
+The need for a log scale here indicates the data probably is not "normal" or we don't have a bell curve distribution
+
+```{R}
+ggplot(txhousing,aes(y=sales))+geom_boxplot()+scale_y_continuous(trans='log10')
+
+```
+
+#*Question/Action 6*
+
+Create a boxplot of the tree heights
+
+Remove the scale_y_continous() portion of the code, you probably won't need it
+
+```{r}
+ggplot(trees,aes(y=Height))+geom_boxplot()
+```
+
+#Biplots or scatter plots
+
+Last one honest!
+
+This is the classic y vs x plot
+
+Let's try median sale price vs number of houses sold
+
+```{R}
+
+ggplot(txhousing,aes(x=sales,y=median))+geom_point()
+
+```
+
+#What does this mean?
+
+The lowest prices are in small or rural counties with few sales.
+
+Larger urban areas have many sales, but few low priced properties
+
+On the other hand,  very large plots of land are also in small counties, so the highest medians are also in areas wiht limited numbers of sales.
+
+# *Question/Action 7*
+
+Plot tree height (y) vs girth (x)
+
+Do you see what your expect
+
+- Yes, the height grows proportionally with the girth, which could be expected based on the physics of supporting large natural structures.
+
+```{R}
+ggplot(trees, aes(x=Girth, y=Height)) + geom_point()
+```
+
+
+#Print this to PDF and Turn it in
+
+-Push the knit button at the top center of the edit window, next to the gear
+
+-Select knit to HTML from the menu
+
+-When it shows you the HTML version,   select "Open in Browser"
+
+-In your browser,  select the browser print command
+
+-Use the "Print to PDF" option in your browser to create the pdf of this file.
+   Upload it to Canvas
+   
+
