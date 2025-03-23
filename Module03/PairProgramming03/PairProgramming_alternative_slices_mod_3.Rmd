@@ -1,0 +1,160 @@
+---
+title: "Pair_Programming_alternative_slicing"
+author: "HDS"
+date: "2024-08-13"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+HDS,  August 13, 2024
+Checked 01/03/2025
+
+# Alternative Slicing
+
+The dplyr package has a lot of nice tools for sorting and slicing and summarizing
+but there are other ways to do it.
+
+In base R we can slice data frames using conditional statements, these
+are often used to select both rows and columns
+
+Last week we used Tidyverse tools to sort and slice,  we need some familiarity
+with base R as well.
+
+## Why discuss this
+
+R almost always has at least three valid ways to do everything
+The dplyr style slicing and sorting is really convenient, but dplyr is only
+available in R,   in Python and other languages, slicing is done in the base R 
+style.     
+
+The base R style slicing was taken from linear algebra (aka matrix algebra), and 
+appears in many other languages.
+
+The tidyverse methods are derived from SQL-based methods of sorting and slicing.  These are
+also seen in the Polars package for Python.
+
+There is also a package called sqldf that allows you to use SQL queries on R dataframes.  If you
+have a lot of experience with sql and want to leverage that,  look at sqldf:
+
+  https://www.geeksforgeeks.org/how-to-write-a-sql-query-in-r/
+
+We don't have time in DSE5001 to teach this, but if you do know SQL well, you can teach yourself sqldf pretty easily.
+
+
+We will use mtcars as an example again to look at base R style manipulations.
+
+```{R}
+head(mtcars)
+```
+
+We can access portions of the dataframe using numeric ranges
+
+We give the rows first, then the columns (this is a linear algebra convention
+most languages follow,  rows, then columns)
+
+```{R}
+mtcars[1:3,1:5]
+```
+
+We can access columns by name
+
+```{R}
+mtcars[1:3,c("mpg","cyl","drat")]
+```
+
+We can access by a condition statement,  usually for rows, much like a filter
+(well, identically to a filter)
+
+```{R}
+mtcars[mtcars$mpg>28,c("mpg","cyl")]
+```
+We can do more complex slices using logical OR (|) and  AND (&) operators
+
+
+```{R}
+mtcars[(mtcars$cyl==6)&(mtcars$hp>150),c("mpg","cyl")]
+```
+
+## Which
+
+We can get the row numbers of variables that mean a specific condition
+using the which operation
+
+```{R}
+which((mtcars$cyl==6)&(mtcars$hp>150))
+
+```
+we can then look at that row
+
+leaving the columns blank gives us all columns
+
+```{R}
+mtcars[30,]
+
+```
+
+This is helpful looking for a minimum or maximum, for example
+
+```{r}
+max_hp_row=which(mtcars$hp==max(mtcars$hp))
+mtcars[max_hp_row,]
+```
+
+# *Question/Action*
+
+-Find the car with the highest mpq and print out it's row
+
+```{r}
+max_mpg_row=which(mtcars$mpg==max(mtcars$mpg))
+max_mpg_row
+```
+
+-Find the cars with 8 cylinders and hp less than 150
+
+```{R}
+slice<-which((mtcars$cyl==8)&(mtcars$hp<150))
+slice
+mtcars[slice,]
+```
+
+*Trick question, there aren't any.*
+
+## tapply
+
+Tapply is an alternative to the summarize function in dplyr
+
+It will apply any function to a column of a dataframe, grouped by one or more
+other variables
+
+we are applying the function mean() to the data mtcars$mpg, grouped by cyl and 
+am
+
+
+```{R}
+tapply(mtcars$mpg,list(mtcars$cyl,mtcars$am),mean)
+```
+
+# *Question/Action*
+
+Load the iris data 
+
+```{r}
+data(iris)
+```
+
+Find the mean value of Sepal.Length grouped by species
+
+```{R}
+tapply(iris$Sepal.Length,list(iris$Species),mean)
+```
+
+Find the standard deviation of Sepal.Length by species as well
+
+```{R}
+tapply(iris$Sepal.Length,list(iris$Species),sd)
+```
+
+

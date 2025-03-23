@@ -1,0 +1,369 @@
+---
+title: "PairProgramming_Slicing"
+author: "HDS"
+date: "2024-08-09"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Pair Programming Slicing
+
+Using dplyr to manipulate, structure and sort data frames
+
+See Wickham et al,  Chapter 3
+
+https://r4ds.hadley.nz/data-transform
+
+
+HD Sheets, August 9, 2024
+checked 01/03/2025
+
+Student Name:Ryan Waterman
+Teamate Name:Nicholas Perry
+
+#Topics- by class of operations
+
+These are tools to regroup data for various purposes, including plotting
+and generating summary tables,  such as "cross tables" or "pivot tables" easily
+
+Row Manipulations
+
+  -filter()
+  -arrange()
+  -distinct()
+  
+Column Manipulations
+
+  -mutate()
+  -select()
+  -rename()
+  -relocate()
+
+Grouping
+
+  -group_by()
+
+Summarize or calculate
+
+  -summarize()
+
+#Libraries
+
+```{R}
+library('tidyverse')
+library('ggplot2')
+```
+
+#example data
+
+we will use the rather standard mtcars dataset of car performance data
+created by MotorTrend (MT) in the 1970s
+
+Not super exciting, but small enough to work with
+
+Read that help menu!
+
+```{R}
+data(mtcars)
+head(mtcars)
+help(mtcars)
+```
+
+#Examples of filtering
+
+Selecting specific rows, based on some condition on a variable
+
+Filter on one variable
+
+```{R}
+# 8 cylinder cars only
+
+filter(mtcars,cyl==8)
+```
+#filter on a condition
+
+using a pipeline %>% to feed the dataframe into the filter
+
+looking for cars with less than 75 hp (yeah, really...)
+
+```{R}
+mtcars %>%filter(hp<75)
+```
+
+#combined conditions
+
+Let's find 6 cylinder cars with mpg>25
+
+we use an AND operation "&" to combine the conditions (cyl==6) with (mpg>20)
+
+```{R}
+mtcars %>%filter( (cyl==6)&(mpg>20))
+
+```
+
+Hmm, lousy fuel economy in the 70s for 6 cylinders.
+
+
+#*Question/Action*
+
+filter the cars with 6 cylinders and a manual transmission
+the column am is 0 for automatic transmissions and 1 for manuals
+
+```{R}
+mtcars %>% filter((cyl==6)&(am==1))
+```
+
+# arrange()
+
+This is a sorting function
+
+sort by increasing mpg
+
+```{R}
+mtcars %>% arrange(mpg)
+```
+decreasing mpgh
+
+Put desc() around the variable
+
+```{R}
+mtcars %>% arrange(desc(mpg))
+```
+
+##sorting on multiple variables
+
+just include them all in the arrange(), using 
+desc() as needed
+
+Lets sort by cylinder (descending) and qsec time (increasing, low qsec time
+means a fast car)
+
+This looks a lot like the sorting options in Excel
+
+```{R}
+mtcars %>% arrange(desc(cyl),qsec)
+```
+#*Queston/Action*
+
+sort the cars by transmission type, mpg and number of cylinders
+
+```{r}
+mtcars %>% arrange(am,mpg,cyl)
+```
+
+# distinct,  finding unique instances
+
+of cylinders
+
+This allows use to determine how many distinct or unique values we have in a column
+
+```{R}
+mtcars %>% distinct(cyl)
+```
+
+Let's look at combinations of cylinders and carbeurators
+
+note the alternate form of the pipe |> is easier to type
+
+```{R}
+mtcars |> distinct(cyl,carb)
+```
+
+Okay, but I want it ordered by cyl
+
+we just pipeline the arrange() after the distinct
+
+```{R}
+mtcars |> distinct(cyl,carb) |> arrange(cyl,carb)
+```
+
+That is much easier to read
+
+#*Question/Action*
+
+find the unique combinations of gear and carb and am appearing in the data set
+
+```{r}
+distinct_set <- mtcars |> distinct(gear, carb, am)
+distinct_set
+```
+
+sort it by increasing am, decreasing gear, decreasing carb d
+
+```{r}
+sorted_distinct_set <- distinct_set |> arrange(am, desc(gear), desc(carb))
+sorted_distinct_set
+```
+
+Do this in two steps, get distinct working first, then arrange() it
+
+# Column based Manipulation
+
+#mutate
+
+Alters columns, by adding new ones
+
+Here is the power to weight (ptw) ratio
+
+Note that here the altered version of mtcars is stored back into mtcars, so the
+change in mtcars is kep
+
+```{R}
+#I accidentally ran this block and the next multiple times, so I was getting an error. Reloading mtcars fixes it.
+data(mtcars)
+mtcars=mtcars |> mutate(ptw=hp/wt)
+
+```
+
+#rename
+
+renames a column
+
+```{R}
+mtcars=mtcars |> rename(power2weight=ptw)
+
+head(mtcars)
+```
+
+
+# relocate
+
+moves the location of a column
+
+the default is to move variables to the front
+.before and .after can alter the location relative to other named columsn
+
+```{R}
+mtcars=mtcars |> relocate(power2weight, .after=hp)
+head(mtcars)
+```
+
+#*Question/Action*
+
+Create a new column called specific_output
+
+specific_output is hp divided by displacement
+
+Place this behind power2weight in the table
+
+Use head() to show this has worked.
+
+```{r}
+mtcars=mtcars |> mutate(specific_output=hp/disp)
+mtcars=mtcars |> relocate(specific_output, .after=power2weight)
+head(mtcars)
+```
+
+# Select
+
+Just choices a set of columns
+
+```{R}
+mtcars |> select(cyl,carb,gear)
+```
+#*Question/Action*
+
+Select specific_output, power2weight and qsec
+
+```{r}
+mtcars |> select(specific_output, power2weight, qsec)
+```
+
+#Groups and summarize
+
+Summarize summarizes a specific statistic
+
+We often want to group by one or more variables, then summarize
+
+it looks like this
+
+group_by() by cylinders and then compute mean mpg using summarize
+
+
+```{R}
+mtcars |>group_by(cyl) |> summarize(mean(hp))
+```
+
+we could then sort this by decreasing cylinders
+
+```{R}
+mtcars |>group_by(cyl) |> summarize(mean(hp)) |> arrange(desc(cyl))
+```
+
+We can group by multiple variables
+
+and compute muliple outputs in the summary
+
+```{R}
+mtcars |> group_by(cyl,am) |>summarize (meanhp=mean(hp), meanpt2=mean(power2weight))|> arrange(desc(cyl))
+```
+This ability to combine group_by and summarize allows us to generate all kinds
+of useful tables
+
+Group_by cyl and carbs,  show the mean weight and mean mpg
+
+```{r}
+mtcars |> group_by(cyl,carb) |> summarize (meanwt=mean(wt), meanmpg=mean(mpg))
+```
+
+#*Question/Action*
+
+Group by carb and cyl and find the mean power2weight ratio for each grouping
+
+```{r}
+mtcars |> group_by(carb, cyl) |> summarize (mean_power2weight=mean(power2weight))
+```
+
+#Counts
+
+n=n() will give us the counts in the summary
+
+```{R}
+mtcars |> group_by(cyl,am) |>summarize (n=n())
+```
+we can also ask for the count of a variable to find n as well
+
+
+```{R}
+mtcars |> group_by(cyl,am) |>summarize(n=length(cyl)) |> arrange(desc(cyl))
+```
+
+# *Question/Action*
+
+Make a table that shows both counts and mean horse power,   arranging by carb and gear
+sort in descending carb and gear order
+
+```{r}
+mtcars |> group_by(carb,gear) |> summarize(n=n(), mean_hp = mean(hp)) |> arrange(desc(carb), gear)
+```
+
+# finding specific rows
+
+df |> slice_head(n = 1) takes the first row from each group.
+df |> slice_tail(n = 1) takes the last row in each group.
+df |> slice_min(x, n = 1) takes the row with the smallest value of column x.
+df |> slice_max(x, n = 1) takes the row with the largest value of column x.
+df |> slice_sample(n = 1) takes one random row.
+
+Find the max hp
+
+```{R}
+mtcars |> slice_max(hp,n=1)
+```
+
+#*Question/Action*
+
+Find the min power2weight values for groupings by cylinder
+
+```{r}
+mtcars |> group_by(cyl) |> slice_min(power2weight,n=1)
+```
+
+
+
+
+
+

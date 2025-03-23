@@ -1,0 +1,397 @@
+---
+title: "Pair_Programming_Long_data_Module3"
+author: "HD Sheets"
+date: "2024-08-12"
+output: html_document
+editor_options: 
+  markdown: 
+    wrap: 72
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+DSE5001 Module 3 pair programming exercise HD Sheets 8/13/2024 checked
+01/03/2025
+
+# Pair Programming Long Data, Module 3
+
+We will look at the World Phones Data set
+
+This data set needs a lot of work
+
+-it doesn't start out as a data frame -the regions and years are labels,
+not values -the rows and columns need to be flipped -we need to convert
+it to long form
+
+This is an example of "data wrangling" in which we need to do a lot of
+data manipulation and structuring before we can do anything useful with
+it.
+
+Watch the steps needed to do this
+
+-changing from one data storage form to another -changing data
+types/formats -transposing-swapping rows and columns -more complex
+changes
+
+Load the data and look at it:
+
+```{r}
+data("WorldPhones")
+WorldPhones
+
+```
+
+Okay, so what are the problems here?
+
+This is not a particularly unusual table, but it' still a mess.
+
+The variable being measured is the number of phones (in units of a
+thousand phones)
+
+They are recorded at different times and different locations
+
+There is a composite key here, the region and the year with the measured
+variable being the number of phones
+
+What type of data storage is this? Use str() to find out what we are
+dealing with
+
+```{R}
+str(WorldPhones)
+```
+
+I want to transpose this to flip the rows and columns and then put this
+into a data frame
+
+t()- transpose, converting rows t columns
+
+data.frame()- convert from a numerical matrix to a dataframe
+
+```{R}
+phone_df=data.frame(t(WorldPhones))
+phone_df
+
+```
+
+That did odd things to the column names, they have an X in them now
+
+we can use rename to rename all the columns, sorta annoying but not hard
+
+```{R}
+library("tidyverse")
+
+phone_df=phone_df |>rename("1951" = X1951,"1956"=X1956,"1957"=X1957,"1958"=X1958,"1959"=X1959,
+                           "1960"=X1960,"1961"=X1961)
+
+```
+
+```{R}
+phone_df
+```
+
+Right now, the regions are row labels, not variables. Dang.
+
+Notice that in the list of regions, there is no listed column name, that
+is because these values are not in a column, they are labels for each
+row.
+
+We need to add a column that is equal to the regions
+
+I want to pivot longer and to do that the regions have to be in a
+variable,
+
+```{R}
+phone_df=phone_df |> mutate(region=rownames(phone_df))
+```
+
+```{R}
+phone_df
+```
+
+Now let's convert this to Long form
+
+In the long form all the variables except region are being converted to
+entries in the "year" column, with the associate values of those years
+being stored in "phones"
+
+This is an example of key-value storage. There is an identifier "region"
+and then a key-value pair of the year (variable) and the number of
+phones (the value)
+
+```{R}
+df_phones_long<-phone_df |> pivot_longer(!region,names_to="year",values_to="phones")
+
+df_phones_long
+```
+
+Okay, that's much better
+
+We can easily create some interesting visuals now
+
+```{R}
+library(ggplot2)
+
+ggplot(df_phones_long,aes(x=year, y=phones,fill=region))+geom_bar(stat="identity",position="dodge")
+```
+
+```{R}
+library(ggplot2)
+
+ggplot(df_phones_long,aes(x=region, y=phones,fill=year))+geom_bar(stat="identity",position="dodge")
+```
+
+# *Question/Action*
+
+The labels along the x-axis of the graph overlap each other and cannot
+be read.
+
+This is not "okay", you can't show anyone this graph like this.
+
+We could fix the problem by figuring out how to rotate the labels along
+the x-axis by ninety degrees.
+
+ggplot allows for fine control of graph elements, such as the x-axis
+label.
+
+Google search and figure out how to rotate the x-axis labels by 90
+degrees on this plot.\
+Create a new code cell and enter the corrected R code to create the plot
+above with the x-axis labels rotated by 90 degrees to make them readable.
+
+```{r}
+ggplot(df_phones_long,aes(x=region, y=phones,fill=year))+geom_bar(stat="identity",position="dodge") + theme(axis.text.x = element_text(angle = 90))
+```
+
+
+# *Question/Action*
+
+Here is the Iris data set collected by Anderson and used in a famous
+paper by RA Fisher
+
+```{R}
+data(iris)
+head(iris)
+```
+
+# *Question/Action*
+
+Do the following in a series of cells
+
+-add the row number as data column, call it FlowerID
+
+-convert this to long form, iris_long -you should have FlowerID and
+species as your two keys -names_to should be "flower part" -values_to
+should be "dimension"
+
+-create a boxplot of values as y=dimension grouped by Species and
+flowerpart This is a group boxplot using dimension and Species as the
+grouping variables see
+<https://r-graph-gallery.com/265-grouped-boxplot-with-ggplot2.html>
+
+```         
+       use x= Species and color=flowerpart
+       
+```
+
+-reverse the grouping order above, so you have y=dimension grouped by
+flowerpart and Species
+
+```{R}
+iris_df=iris |> mutate(FlowerID=rownames(iris))
+```
+
+```{R}
+iris_df
+```
+
+```{R}
+iris_df_long<-iris_df |> pivot_longer(!FlowerID & !Species,names_to="flowerpart",values_to="dimension")
+
+iris_df_long
+```
+
+```{r}
+ggplot(
+  iris_df_long,
+  mapping=aes(x=Species,y=dimension,fill=flowerpart)
+       ) + geom_boxplot()
+```
+
+```{r}
+ggplot(
+  iris_df_long,
+  mapping=aes(x=flowerpart,y=dimension,fill=Species)
+       ) + geom_boxplot()
+```
+
+# Correlation
+
+We'll work with the Iris data set again
+
+We want just one species, not all of them, we'll just select setosa
+
+We want to start with the wide data frame
+
+```{R}
+df_setosa= iris |> filter(Species=='setosa')
+
+head(df_setosa)
+```
+
+Now let's look at correlation of Sepal.Length and Sepal.Width
+
+Plotting first
+
+```{R}
+library("ggplot2")
+ggplot(df_setosa,aes(x=Sepal.Length,y=Sepal.Width))+geom_point()
+
+```
+
+There looks to be a trend (ie correlation) here, with quite a bit of
+noise
+
+What is the correlation
+
+```{R}
+cor(df_setosa$Sepal.Length,df_setosa$Sepal.Width)
+
+```
+
+We have an R of 0.745, reasonably high but not extreme
+
+We could look at the correlation of of Sepal length and width in all 3
+species
+
+```{R}
+iris |>group_by(Species) |>summarize(R=cor(Sepal.Length,Sepal.Width))
+```
+
+#Looking at all Pairwise plots for the Setosa species data
+
+The function ggpairs from GGally gives us a fast visual summary of the
+data
+
+We get histograms of each variable, boxplots of each variable, biplots
+of each pair and the correlation of each pair
+
+This is a handy tool for exploratory analysis, but is too much at once
+for presentations
+
+
+```{R}
+library('GGally')
+ggpairs(df_setosa)
+
+```
+
+# *Question/Action*
+
+-Do all the distributions look normal/gaussian/bell curve? Explain why
+or why not
+
+*All but the petal width look normal. The petal width is deceiving because the resolution on the x-axis is very low, and one value had many instances, creating a false "bell curve".*
+
+-Which biplots look like they show a trend?
+
+*Sepal length vs. sepal width as well as petal length vs. petal width show some correlation.*
+
+-Which two correlations are the highest?
+
+*Sepal Length vs. Sepal Width and Petal Length vs Petal Width.*
+
+-Which two variables seem to have the most outliers?
+
+*Petal Length and Sepal Width. Sepal Width has a higher resolution along the x axis, so it likely has a higher quantity of outliers compared to petal width.*
+
+# *Question/Action*
+
+Load the mtcars built-in data set
+
+```{r}
+data(mtcars)
+```
+
+
+Select only mpg,disp, hp, wt and qsec from the data frame, call it
+mtcars_few
+
+```{r}
+mtcars_few <- mtcars |> select(mpg, disp, hp, wt, qsec)
+mtcars_few
+```
+
+Create a ggpairs plot
+
+```{r}
+ggpairs(mtcars_few)
+```
+
+-Which variables, if any, look normal?
+
+*mpg, qsec, and it could be argued wt as well.*
+
+-Which variables seem to have skew?
+
+*All variables have skew.*
+
+From the plots, which variables have positive correlation, which have
+negatitve? Do any appear to have little or no correlation?
+
+*Positive Correlation:*
+*mpg vs. qsec, disp vs. hp, disp vs. wt, and hp vs. wt*
+
+*Negative COrrelation:*
+*mpg vs. disp, mpg vs. hp, mpg vs. wt, and hp vs. qsec*
+
+*Little or No Correlation*
+*qsec vs. wt*
+
+-Which pair has the highest positive correlation?
+
+*disp vs. wt*
+
+-Which has the most extreme negative correlation?
+
+*wt vs. mpg*
+
+# *Question/Action*
+
+Convert mtcars_few to a long version
+
+```{R}
+mtcars_few_long<-mtcars_few |> 
+  mutate(Make_Model=rownames(mtcars_few)) |> 
+  pivot_longer(!Make_Model,names_to="characteristic",values_to="value")
+
+mtcars_few_long
+```
+
+Create a boxplot that shows all 5 variables in one plot
+
+```{r}
+ggplot(
+  mtcars_few_long,
+  mapping=aes(x=Make_Model,y=value,fill=characteristic)
+       ) + geom_boxplot() + theme(axis.text.x = element_text(angle = 90))
+```
+
+*well... that certainly isn't ideal, let's select a smaller set of the data*
+
+```{r}
+mtcars_few_long<-head(mtcars_few_long,15)
+```
+
+```{r}
+ggplot(
+  mtcars_few_long,
+  mapping=aes(x=Make_Model,y=value,fill=characteristic)
+       ) + geom_boxplot() + theme(axis.text.x = element_text(angle = 90))
+```
+
+*I can't really argue that this is any better, there is just too much variance in the values across the characteristics.*
+
+
+

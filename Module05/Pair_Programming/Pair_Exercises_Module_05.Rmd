@@ -1,0 +1,339 @@
+---
+title: "Pair_Programming_Exercises_Module 05"
+author: "HD Sheets"
+date: "2024-09-10"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+HDS, created 09/10/2024
+checked 01/03/2024
+
+
+# Pair exercises,  Module 5
+
+Drawn from Chapter 3 of Open Intro to Statistics
+
+These problems mostly require a written discussion, although there are some
+calculations as well.   Add calculation cells as needed, but always be sure to give
+me a discussion
+
+
+## 3.2 Roulette wheel. 
+
+The game of roulette involves spinning a wheel with 38 slots: 18 red, 18 black, and 2
+green. A ball is spun onto the wheel and will eventually land in a slot, where each slot has an equal chance
+of capturing the ball. {assume the wheel is "fair" and all slots are really equally likely}
+
+(a) You watch a roulette wheel spin 3 consecutive times and the ball
+lands on a red slot each time. What is the probability that the
+ball will land on a red slot on the next spin?
+
+--------------------------------------------
+
+```{r}
+18/38
+```
+*About 47%. These are all independent trials, it doesn't matter how many times you spin, the odds are the same each time.*
+
+(b) You watch a roulette wheel spin 300 consecutive times and the
+ball lands on a red slot each time. What is the probability that
+the ball will land on a red slot on the next spin?
+-------------------------------------------------------------
+
+```{r}
+18/38
+```
+*This is the same as spinning 3 times and getting a red on the fourth. The probability of getting red does not change, it is independent of the spin count.*
+
+(c) Are you equally confident of your answers to parts (a) and (b)?
+Why or why not?
+
+-----------------------------------
+
+*Yes, both A and B represent the same underlying probability, B just shows a more extreme scenario, but the number of spins does not impact the probability of getting a red.*
+
+*A long series of positive outcomes is called a "run"*
+
+##3.6 Dice rolls. 
+
+If you roll a pair of fair dice, what is the probability of getting specific values or outcomes 
+for the total of the two dice?
+
+Do this by enumeration,   writing down the combinations that give you the desired result, and then divide
+by the total number of combinations.
+
+How may possible combinations are there of two dice rolls?
+-----------------------------
+
+1, 1
+1, 2
+1, 3
+1, 4
+1, 5
+1, 6
+2, 2
+2, 3
+2, 4
+2, 5
+2, 6
+3, 3
+3, 4
+3, 5
+3, 6
+4, 4
+4, 5
+4, 6
+5, 5
+5, 6
+6, 6
+
+*There are 21 different combinations*
+
+(a) getting a sum of 1?
+-------------------------------------
+
+*This is impossible, the lowest sum is 2.*
+
+
+(b) getting a sum of 5?
+---------------------------------------
+
+*2, 3 and 1, 4 are the only options, therefore two combinations.*
+
+
+(c) getting a sum of 12?
+---------------------------
+
+*6,6 is the only possible option, therefore one combination.*
+
+## 3.8 Poverty and language. 
+
+The American Community Survey is an ongoing survey that provides data
+every year to give communities the current information they need to plan investments and services. The
+2010 American Community Survey estimates that 14.6% of Americans live below the poverty line, 20.7%
+speak a language other than English (foreign language) at home, and 4.2% fall into both categories
+
+(a) Are living below the poverty line and speaking a foreign language at home disjoint?
+------------------------------------------------------------------------------
+
+*They are not disjoint because there is overlap between the number of Americans living below the poverty line and those speaking a foreign language at home.*
+
+
+(b) Draw a Venn diagram summarizing the variables and their associated probabilities.
+----------------------------------------------------------------------------------------
+
+
+Do this on paper, agree on it with your partner, but do not turn it in,
+
+
+
+(c) What percent of Americans live below the poverty line and only speak English at home?
+---------------------------------------------------------------------------------------------
+
+```{r}
+14.6-4.2
+```
+
+*10.4% of Americans live below the poverty line and speak English at home. The percentage of people in both categories can't be counted in this scenario.*
+
+(d) What percent of Americans live below the poverty line or speak a foreign language at home?
+----------------------------------------------------------------------------------------------
+
+
+```{r}
+14.6+20.7-4.2
+```
+*The number of Americans that live below the poverty line OR speak a foreign language at home does not include the 4.2% in both categories.*
+
+
+(e) What percent of Americans live above the poverty line and only speak English at home?
+---------------------------------------------------------------------------------------------
+
+*What percentage of Americans live above the poverty line?*
+
+100-14.6=85.4
+
+*What percentage don't speak English at home and are above the poverty line?*
+
+20.7-4.2=16.5
+
+```{r}
+100-14.6-(20.7-4.2)
+```
+
+(f) Is the event that someone lives below the poverty line independent of the event that the person speaks
+a foreign language at home?
+
+--------------------------------------------------------------------------------------------------
+
+State your evidence for this from the problem statement.
+
+
+*No, they are joint, therefore they are dependent on each other. If they were independent, we would be taking the product of the probabilities.*
+
+
+## 3.13 Joint and conditional probabilities. 
+
+P(A) = 0.3, P(B) = 0.7
+
+(a) Can you compute P(A and B) if you only know P(A) and P(B)?
+------------------------------------------------------------
+
+This one has my solution, read through it.
+
+No,  since we don't know if they are independent or not.
+
+P(A AND B) =  P(A)P(B)   only when they are indepenent
+
+
+
+(b) Assuming that events A and B arise from independent random processes,
+i. what is P(A and B)?
+ii. what is P(A or B)?
+iii. what is P(A|B)?
+
+---------------------------
+
+If we know they are independent
+
+i.) P(A and B) = P(A)P(B)= 0.3*0.7 = 0.21
+
+ii) P(A or B)  = P(A)P(not B) + P(A)P(B)+ P(not A)P(B)= 1-P(not A)P(not B)
+
+p(not A)= 1-0.3= 0.7,   p(not B) = 1-0.7= 0.3,    p(not A) p(not B) = 0.21 also
+
+
+
+(c) If we are given that P(A and B) = 0.1, are the random variables giving rise to events A and B indepen-
+dent?
+
+---------------------------
+
+In general
+
+P(A and B) = P(A given B)P(B)
+
+0.1   = P(A given B) 0.7
+
+0.1/0.7 = 0.143 = P(A given B) = P(A|B)
+
+P(A|B) is not equal to P(A) and the events are not independent
+
+(d) If we are given that P(A and B) = 0.1, what is P(A|B)?
+------------------------------------------------------------
+
+See above,  P(A|B)= 0.143
+
+
+## 3.14 PB & J. 
+
+Suppose 80% of people like peanut butter, 89% like jelly, and 78% like both. Given that a
+randomly sampled person likes peanut butter, what's the probability that he also likes jelly?
+----------------------------------
+
+This is a joint and conditional probability problem, use the ideas from 3.13 above to solve it.
+
+*We are interested in P(A|B) or P(Jelly|Peanut Butter)*
+
+*P(Jelly and Peanut Butter) = P(Jelly given Peanut Butter)P(Peanut Butter)*
+
+*0.78/.80*
+
+```{r}
+0.78/0.80
+```
+
+*There is a 97.5% probability that he also likes Jelly*
+
+-------------------------------------------------
+## 3.15 Global warming. 
+
+A Pew Research poll asked 1,306 Americans "From what you've read and heard,
+is there solid evidence that the average temperature on earth has been getting warmer over the past few
+decades, or not?". The table below shows the distribution of responses by party and ideology, where the
+counts have been replaced with relative frequencies.40
+
+
+
+                            Response
+                              Earth is    Not     Don't Know
+                              warming     warming Refuse            Total
+Conservative Republican         0.11        0.20    0.02            0.33
+Party and Mod/Lib Republican    0.06        0.06    0.01            0.13
+Ideology Mod/Cons Democrat      0.25        0.07    0.02            0.34
+Liberal Democrat                0.18        0.01    0.01            0.20
+Total                           0.60        0.34    0.06            1.00
+
+
+ANSWER THESE QUESTIONS BASED ON THE DATA ABOVE ONLY, NOT PERSONAL PRIOR BELIEF-  ie using
+purely frequentist statistical reasoning
+
+
+
+(a) Are believing that the earth is warming and being a liberal Democrat mutually exclusive?
+-----------------------------------------------------------
+
+*It appears that these are not mutually exclusive, as the liberal democrat response is statistically about 1/3 of the time.*
+
+
+(b) What is the probability that a randomly chosen respondent believes the earth is warming or is a liberal
+Democrat?
+------------------------------------------------------
+
+*P(A) = .6*
+*P(B) = .2*
+*P(A or B) = 1 - P(not A)P(not B)*
+
+```{r}
+1 - (1-.6)*(1-0.2)
+```
+
+(c) What is the probability that a randomly chosen respondent believes the earth is warming given that he
+is a liberal Democrat?
+----------------------------------------------------------
+
+*P(Warming and Liberal Democrat) = P(Warming given Liberal Democrat)P(Liberal Democrat)*
+*0.18 = P(Warming given Liberal Democrat)(0.2)*
+*0.18/0.2 = P(Warming given Liberal Democrat)*
+
+```{r}
+0.18/0.2
+```
+
+(d) What is the probability that a randomly chosen respondent believes the earth is warming given that he
+is a conservative Republican?
+--------------------------------------------
+
+*P(Warming and Conservative Republican) = P(Warming given Conservative Republican)P(Conservative Republican)*
+*0.11 = P(Warming given Conservative Republican)(0.33)*
+*0.11/0.33 = P(Warming given Conservative Republican)*
+
+```{r}
+0.11/0.33
+```
+
+(e) Does it appear that whether or not a respondent believes the earth is warming is independent of their
+party and ideology? Explain your reasoning.
+----------------------------------------------
+
+*No, 90% of liberal democrats believe that the earth is warming, whereas only 33% of conservative republicans believe the earth is warming.*
+
+(f) What is the probability that a randomly chosen respondent is a moderate/liberal Republican given that
+he does not believe that the earth is warming?
+-----------------------------------------------------
+
+*P(Not Warming and Mod/Liberal Republican) = P(Not Warming given Mod/Liberal Republican)P(Mod/Liberal Republican)*
+*0.06 = P(Not Warming given Mod/Liberal Republican)(0.13)*
+*0.06/0.13 = P(Not Warming given Mod/Liberal Republican)*
+
+```{r}
+0.06/0.13
+```
+
+
+
+
+

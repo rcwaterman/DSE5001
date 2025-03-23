@@ -1,0 +1,573 @@
+---
+title: "Regression and GLMs"
+author: "HDS"
+date: "2024-09-02"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Pair Programming and Generalized Linear Models,  Module 07
+
+## DSE5001
+
+Created 09/02/2024
+checked 01/03/2025
+
+
+Name:Ryan Waterman
+Partner Name:
+
+Date:2/26/2025
+
+
+```{R}
+library(ggplot2)
+library(tidyverse)
+```
+
+# Data set
+
+We've used mtcars a lot, but it's an easy set to understand, and it has both
+continuous variables and categories
+
+```{R}
+head(mtcars)
+```
+
+We will want to create cyl,vs, am and gear as factors later in this example
+
+```{R}
+mtcars$cyl=factor(mtcars$cyl)
+mtcars$am=factor(mtcars$am,labels=c("auto","manual"))
+mtcars$vs=factor(mtcars$vs,labels=c("V","inline"))
+mtcars$gear=factor(mtcars$gear)
+```
+
+# Repeated Use of this set
+
+I am going to show a lot of examples of calculations all using this same data set, 
+this saves a lot of time.   This repeated use of a dataset,  running a whole series
+of closely related analyses is not something one would do in the real world.
+
+On targets the specific analysis used to the questions being asked and the data 
+in use.   The hodgepodge of analyses run here is just to show how they work 
+
+# Linear Regression
+
+Hypothesis or Modeling Goal,   *I think heavy vehicles will get poor mileage*
+
+so mpg should correlate negatively with weight
+
+We will
+
+  -plot mpg vs weight
+  -fit a linear regression and look at the results
+  -obtain the residuals
+  -test the results for violation of the assumptions
+
+
+```{R}
+ggplot(mtcars, aes(x=wt,y=mpg))+geom_point()
+```
+Not terrible,  it looks roughly linear,  although the three points on the far
+left look like possible outliers
+
+Let's create the model
+
+  the statement,  "mpg~wt" is an R formula,  the ~ reads as "predicted by",  so
+  mpg is predicted by wt in this model,   R will add the intercept as well
+
+We are using the lm() function to run a classic regression here
+
+```{R}
+Model_1=lm(mpg~wt,data=mtcars)
+
+summary(Model_1)
+
+```
+
+# Summary(Model_1)
+
+The summary tells us a lot about the model.
+
+The F statistic is 91.38,  with a p-value of 1.3e-10,   so that is a large F value
+and the model has statistically significant explanatory power
+
+The adjusted R^2 is 0.7446,  again, substantial,   the model explains about 74.5% of
+the variance in mpg of the car.
+
+The b value (or intercept) is 37.3, with a standard error of 1.9,  it's t-value is 19.9, so it
+is clearly not zero
+
+The slope is listed as (wt),  meaning it is the slope for the weight.  This value is -5.3,  so mpg decreases with
+weight as expected, the standard error in the slope (m) is about 0.56,  so the 95% confidence interval would be
+-5.3+-1.96*0.56, rather wide, but it excludes zero, so this model is statistically meaningful
+
+*Looking at the residuals*
+
+What do we have in Model_1
+
+```{r}
+str(Model_1)
+```
+
+Okay, the residuals are in Model_1$residuals
+
+Let's plot a histogram
+
+```{R}
+hist(Model_1$residuals)
+```
+Well, not terrible at least,  maybe slightly positive right tail?
+
+*residuals vs weight*
+
+```{R}
+plot(mtcars$wt,Model_1$residuals)
+```
+Neither great nor terrible,  maybe slightly U shaped??
+
+There is a statistical test for normality, we can see if we can reject the null
+hypothesis of normality,   so we are asking if there is strong evidence the
+residuals are not normal
+
+THis is a test called the Wilks-Shapiro test of normality
+
+```{R}
+shapiro.test(Model_1$residuals)
+
+```
+We cannot convincingly reject the null that the residuals are normal.
+
+Ggplot will show us the regression model with a confidence interval
+
+```{R}
+ggplot(mtcars,aes(x=wt,y=mpg)) +geom_point()+geom_smooth(method="lm")
+```
+
+# *Question/Action*
+
+Build a regression model 
+
+We will use the lime data set
+
+```{R}
+library(GLMsData)
+data(lime)
+head(lime)
+
+```
+
+Foliage-  biomass of foliage
+DBH-tree diameter
+Age-age of the tree
+Origin- origin of the tree, coppice, Natural, Planted
+
+Do the following:
+
+-Plot Foliage vs DBH
+
+```{r}
+plot(lime$Foliage, lime$DBH)
+```
+
+-Plot DBH vs Age
+
+```{r}
+plot(lime$DBH, lime$Age)
+```
+
+Which looks more like to have a strong linear relationship?
+
+*DBH vs. Age*
+
+Create a linear model of Foliage~DBH, or DBH~Age
+
+```{r}
+model=lm(DBH~Age, lime)
+summary(model)
+```
+
+Get the statistics and explain what they mean
+
+*An R-squared of 0.668 suggests that the linear model fits the data moderately well. The small p-value indicates a rejection of the null hypothesis, and the accompanying large F-value shows that the relationship between the variables is strong.*
+
+Look at the residuals,  plot a histogram and residuals vs x.   Run the 
+Wilk's Shapiro test
+
+```{r}
+hist(model$residuals)
+```
+
+```{r}
+plot(lime$DBH,model$residuals)
+```
+
+
+```{r}
+shapiro.test(model$residuals)
+```
+
+Explain what you see- I'm looking for a fair amount of detail in this discussion.
+
+*The Shapiro-Wilk normality test is used to test if the input sample is normal. In this case, we are testing that the residuals of the linear model are normal. A small p-value indicates the null hypothesis is rejected, therefore the residuals are not normal, even though the W statistic is nearly 1. The W statistic measures how well a model conforms to the normal distribution, but the p-value takes precedent, and it suggests that the null hypothesis is rejected.*
+
+# General Linear Models
+
+We will run the same analysis using a different function, a generalized linear
+model  (glmer)
+
+```{R}
+library(lme4)
+```
+
+
+In practice,  I don't bother with lm(),  I just go directly to glm() or similar
+models
+
+```{R}
+Model_2=glm(mpg~wt,data=mtcars)
+
+summary(Model_2)
+```
+This looks much like the set of results we got from lm(), but it doesn't have
+the F or R^2,   but it does have the AIC score
+
+We can use the anova function to get more information (like the F score for the model)
+
+```{R}
+anova(Model_2,test=c("F"))
+```
+
+Notice that we get an F score for the wt as a predictor, as well as the related pvalue
+
+We can calculate a R^2 for the model, this is McFadden's R-squared
+
+```{R}
+with(summary(Model_2),1-deviance/null.deviance)
+```
+Which is the same Rsquare we saw for the LM (but not the adjusted R^2)
+
+# Multiple Continuous predictors
+
+Okay lets use wt,hp and disp (engine displacement) to predict mpg
+
+the formula is mpg~wt+hp+disp,    meaning we want to use all three predictors
+
+```{R}
+Model_3=glm(mpg~hp+wt+disp,data=mtcars)
+summary(Model_3)
+```
+ when we look at this set of results, the t value for disp is-0.091, with a p of 0.928, so
+ when we already have hp and wt as predictors,   disp doesn't help any.  The other two predictor
+ are both significant
+ 
+```{R}
+ anova(Model_3,test="F")
+```
+This shows use the F values for each predictor, again disp is not a useful predictor
+
+```{R}
+with(summary(Model_3),1-deviance/null.deviance)
+```
+Using 3 predictors, we are now predicting 82.6% of the variance, an improvement 
+over the roughly 75% with one predictor
+
+# Using only categorical predictors
+
+Let's create a table first
+
+```{R}
+mtcars %>% group_by(am,cyl,vs) %>% summarise("Mean Mpg"=mean(mpg))
+```
+
+the variable vs doesn't look all that helpful,but we'll see
+
+boxplots
+
+```{R}
+ggplot(mtcars,aes(x=cyl,y=mpg,color=am))+geom_boxplot()
+```
+
+
+
+we will predict mpg using am, cyl, vs
+
+```{R}
+Model_4=glm(mpg~am+cyl+vs,data=mtcars)
+summary(Model_4)
+```
+Looking at this
+
+am manual is significant, as are the cylinder categories
+
+note am auto is the default as is cyl=4 so a 4 cylinder auto has mpg=(Intercept)=22.8
+
+A 4 cylinder with manual would have mpg=(Intercept)+(ammanual)=22.8+3.165= 25.9 mpg
+
+vs is not significant (vs indicates a v piston configuration vs an inline engine)
+
+```{R}
+anova(Model_4,test="F")
+```
+This shows an F for each variable
+am and cyl are statistically meaning ful, vs is not
+
+We can get the R^2
+
+```{R}
+with(summary(Model_4),1-deviance/null.deviance)
+```
+
+# GLM with both continuous variables and factors
+
+We will use mpg predicted by hp, wt (continuous) and am,cyl (factors/categories)
+
+```{R}
+Model_5=glm(mpg~am+cyl+hp+wt,data=mtcars)
+summary(Model_5)
+```
+It now appears the category cyl=8 is not helpful, nor is am,  due to the other 
+predictors
+
+Remember, the predictors are all correlated, so when we combine many of them in 
+a model, only the most effective are typically useful
+
+```{R}
+anova(Model_5,test="F")
+```
+Interesting, the F score indicates all the predictors are effective.
+
+I'd go with the F-test,  rather than the t
+
+```{R}
+with(summary(Model_5),1-deviance/null.deviance)
+```
+
+With a lot of predictors in the model, we are up to 87% prediction
+
+We should look at the residuals
+
+```{R}
+hist(Model_5$residuals)
+```
+
+```{R}
+shapiro.test(Model_5$residuals)
+
+```
+There is no strong evidence that the residuals are non-normal.
+
+There is a risk here, we have failed to reject a null,  which is always a
+weak argument.
+
+# *Question/Action*
+
+Load the lungcap data
+
+This is measured lung capacity data among children
+
+```{R}
+data(lungcap)
+
+head(lungcap)
+```
+
+-What do you think the dominant factor determining lung capacity will be?
+
+*Based on the available variables, I would estimate height to the strongest factor influencing lung capacity, which will affect the lung volume based on overall size. This age range seems to span pre and post puberty, so there will be dramatic changes in the height of the subject over time based on age as well, but age is not a perfect predictor of height.*
+
+-Would the same factor dominate among adults?
+
+*No, I would expect smoker status to be the primary factor here. Adults are likely to have been smoking for much longer, and their health would have had more time to decline as a result. Also, age/height are now worse predictive factors because there could be very healthy or very unhealthy individuals in the same age/height range.*
+
+Age- subject age
+FEV- Forced expelled volume,  a measure of lung capacity
+Ht- height in inches
+Gender- 
+Smoke,- 0 is non smokers, 1 is smokers
+
+Build a GLM of FEV ~ age, ht,gender and smoke
+
+```{r}
+model_lungcap=glm(FEV~Age + Ht + Gender + Smoke, data=lungcap)
+summary(model_lungcap)
+```
+
+Get the stats and explain them
+
+*The strongest predictive factor appears to be height, based on the high t-value and low p-value. The next strongest predictors are age and gender (male), respectively, which are also strong predictive factors for height. Interestingly, smoking is not a strong predictor of FEV, but it is negatively correlated, based on the negative slope.*
+
+By how much does smoke decrease lung capacity?
+
+*Smoking decreases FEV by about 0.087. The smoke variable is comprised of just 0 and 1, therefore the negative slope is the change in FEV between non-smoker and smoker.*
+
+
+# Logistic Regression
+
+Can we predict whether the car has an automatic or manual transmission?
+
+This is a categorical prediction,  a probability that the car has an automatic
+or manual transmission
+
+Most predictions are either regressions or categorizations, this holds true for
+ML models as well.
+
+We will try to predict am using mpg, hp, cyl
+
+```{R}
+Model_lo=glm(am~mpg+cyl,family=binomial(link='logit'),data=mtcars)
+summary(Model_lo)
+
+```
+Looking at this set of results, the model does not work,  we have no non-zero
+parameter values
+
+# Surviving the titanic, a logistic model
+
+We will try the titanic data set, looking at classifying passengers as surviving
+or not
+
+```{R}
+library("titanic")
+data(titanic_train)
+head(titanic_train)
+```
+
+what have we got
+```{R}
+str(titanic_train)
+```
+```{R}
+titanic_train$Survived=factor(titanic_train$Survived,labels=c("no","yes"))
+titanic_train$Pclass=factor(titanic_train$Pclass)
+titanic_train$Sex=factor(titanic_train$Sex)
+```
+
+Let's predict survival using only Pclass and Sex
+
+We could do more with this, but this is an example
+
+```{R}
+Model_titanic=glm(Survived~Pclass+Sex,family=binomial(link='logit'),data=titanic_train)
+summary(Model_titanic)
+```
+
+Okay, in this model, all the predictors are meaningful
+
+Let's figure out how accurate the logistic regression is
+
+```{R}
+
+# get the predictions of the probability of survival for each passenger
+
+y_pred=predict.glm(object=Model_titanic,newdata=titanic_train,type="response")
+
+# to binarize the answer into a yes/no prediction, set all values above 0.5 to 1
+# and all values below to 0
+
+y_pred=(y_pred>0.5)*1
+
+#now convert to a factor so we can compare
+
+y_pred=factor(y_pred,labels=c("no","yes"))
+
+y_pred[1:10]
+```
+```{R}
+# sum up the number of cases where the prediction is correct
+# and divide the the size of the data set to get the rate of correct predictions
+
+sum(y_pred==titanic_train$Survived)/dim(titanic_train)[1]
+```
+
+*confusion matrix*
+
+We can show the results using a confusion matrix
+
+This will show us the nature of the errors, and a number of other statistics,
+including a confidence interval on the accuracy
+
+```{R}
+library("caret")
+confusionMatrix(y_pred,titanic_train$Survived)
+```
+
+
+
+# *Question/Action*
+
+We will look at predicting loan defaults using data from the ISLR package
+
+```{R}
+library("ISLR")
+(default_tib <- as_tibble(ISLR::Default))
+
+head(default_tib)
+default_tib$default=factor(default_tib$default,labels=c("no","yes"))
+```
+Build a logistic regression model to predict default using student, balance
+and income
+
+```{r}
+model_default = glm(default~student + balance + income, family=binomial(link = "logit"), data=default_tib)
+summary(model_default)
+```
+
+Determine the accuracy rate of the logistic regression model,  create a confusion matrix
+
+```{R}
+
+# get the predictions of the probability of default
+
+y_pred=predict.glm(object=model_default,newdata=default_tib,type="response", levels=levels(default_tib$default))
+
+# to binarize the answer into a yes/no prediction, set all values above 0.5 to 1
+# and all values below to 0
+
+y_pred=(y_pred>0.5)*1
+
+#now convert to a factor so we can compare
+
+y_pred=factor(y_pred,labels=c("no","yes"))
+
+y_pred[1:10]
+
+```
+
+```{r}
+# sum up the number of cases where the prediction is correct
+# and divide the the size of the data set to get the rate of correct predictions
+
+sum(y_pred==default_tib$default)/dim(default_tib)[1]
+
+```
+
+```{R}
+confusionMatrix(y_pred,default_tib$default)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

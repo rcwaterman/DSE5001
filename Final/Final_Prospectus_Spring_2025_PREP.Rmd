@@ -1,0 +1,547 @@
+---
+title: "Final Exam Prospectus"
+author: "HD Sheets"
+date: "2024-10-07"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Final Exam Prospectus
+
+Prep for the exam by making sure you can do all these problems,  and that
+you understand the content of each data set.
+
+You may want to do some research on your own to understand these data sets a bit,
+and to be sure you understand the ideas in each problem.
+
+Prepare an RMD with answers to all of these problems.  You may use the RMD and 
+other sources of information during the exam.  You can look things up during the exam, but you
+cannot asking questions of another living person,  or of LLM models like ChatGPT or Claude.
+
+Turn in your prepared RMD with all answers prepared and annotated at the start of the
+exam.  The preparation is 40% of the exam grade.
+
+Then you will get 3 randomly chosen questions from this set of questions to
+answer on the exam during the one-hour exam window.  The exam will be 60% of the grade.
+
+Note-If you have a problem wrong on the preparation section,  that will cause you to lose
+more points on the in-class exam as well,  just be aware of that and be sure you understand 
+the preparation material.
+
+The questions during the live exam will be modified,  so while you can (and should)
+cut and paste answers from your preparation RMD,  you will need to modify your
+answers to reflect the changes in the exam question
+
+I might alter the exam question by
+
+a.) changing the data set
+b.) changing what variables I want to see plotted, or in a table
+c.) changing ranges of values
+
+I will use the Quiz function in Canvas to randomly give you three problems,   cut and paste these
+into an RMD and then use your prepared code to answer them.   You can just paste the altered problems right
+into your prepared RMD if that helps.
+
+I will answer questions about the problem statements, but will not tell you if
+you have a problem correct or not.
+
+Most of the questions are derived from homework and/or PairProgrammming examples
+from Modules 5 to 7, but earlier material may be included
+
+Module 8 content is not covered on this exam.
+
+This exam thus has a "take home preparation" portion and a "live" portion.  Due to the sheer volume
+of material in the class and the rapid pace,  this format will reward extensive preparation work, and
+lower the impact of work during the one hour exam window.  At the same time, you do have to be able
+to execute the code quickly,  demonstrating that you understand how it works.
+
+
+# Exam Time
+
+The exam will open at 5 pm EST October 17 and close at 9pm October 18, you must complete the
+exam in a one-hour long block within that time frame
+
+Note:  I have be available on Zoom from 7 to 9 pm EST on Thursday Oct 17 and 7-9 pm EST on Friday Oct 18, so that
+you can jump on zoom if you have to ask me questions.   I strongly urge you to take the exam during one of the times
+when I am online.   I cannot guarantee you will be able to ask me questions at other times during the exam window. If you feel you 
+will want to be able to ask questions,  try to plan on taking the exam between 7-9 pm EST on Thursday or Friday.
+
+
+
+
+
+
+## Problem 1
+
+                  Health Status
+Health                Excellent     Very Good   Good    Fair    Poor    Total
+Coverage        No    458             727       854     385     99      2,523
+                Yes   4,199         6,245     4,821     1,634   578     17,477
+Total                 4,657         6,972     5,675     2,019   677     20,000
+
+a.) What is the probability that a single individual drawn at random has excellent
+health and does not have Health Insurance?   What would be the standard error on this
+estimate of a proportion?
+
+*This cohort represents 458 of the 20000 subjects.*
+
+```{r}
+n=20000
+p=458/n
+p
+```
+
+*The probability is about 2.3%*
+
+```{r}
+SE=((p*(1-p))/n)^0.5
+SE
+```
+
+*The standard error is about 0.00106.*
+
+b.)  What is the probability of having Very Good health overall?
+
+```{r}
+6972/20000
+```
+
+*About 34.9%*
+
+c.)  what is the probability of having health coverage?
+
+```{r}
+P_hc=17477/20000
+P_hc
+```
+
+*About 87.4%*
+
+d.) What is the probability of having excellent health given that a person has
+health coverage?
+
+*P(EX | HC) = P(EX and HC)/P(HC)*
+
+```{r}
+P_ex_given_hc = (4199/17477)/P_hc
+P_ex_given_hc
+```
+
+*About 27.5%*
+
+e.) Are having excellent health and having health coverage independent?
+
+*To determine this, let's look at the proportion of people without health coverage at each health level. If these variables were mutually exclusive, I would expect there to be a dramatically smaller proportion of people with excellent health and no health coverage.*
+
+```{r}
+excellent=458/4657
+very_good=727/6972
+good=857/5675
+fair=385/2019
+poor=99/677
+
+cat("Excellent Proportion: ", round(excellent*100,2),"%\n", 
+    "Very Good Proportion: ", round(very_good*100,2),"%\n",
+    "Good Proportion: ", round(good*100,2),"%\n",
+    "Fair Proportion: ", round(fair*100,2),"%\n",
+    "Poor Proportion: ", round(poor*100,2),"%\n",
+    sep=""
+    )
+```
+
+*It appears that having excellent health and health care could be independent, as there is a relatively uniform, maybe even slightly normal distribution, of health proportions by coverage status. The excellent proportion does represent the smallest, but it is not significantly smaller.*
+
+# Problem 2
+
+Written answers.
+
+Suppose we have the following situations
+
+   2.1.)  I wish my friend a happy birthday, but it is not her birthday.
+
+   2.2.) I forget to wish my friend a happy birthday on her birthday.
+
+a.) Which of 2.1 and 2.2 is a false positive?
+
+*2.1 is a false positive.*
+
+b.) Which of 2.1 and 2.2 is a false negative?
+
+*2.2 is a false negative*
+
+c.) Which of the two errors is more of concern?   What is the "cost" of each mistake.
+
+*This depends on whether the critical result is positive or negative. Let's assume that a positive is an instance of a failure. In this case, false positives can arise from an abundance of caution, which is often preferable in most real world scenarios. False negatives, however, would be very dangerous in this scenario, as they would be a failure that was not identified, and could reach the customer, which could tarnish reputation. In the opposite case, if a pass is a positive, the false positive would be the more dangerous error.*
+
+If we are running a test of a new marketing campaign, of ads A and B.  We decide we want a significance level
+of 3% for our sample size of 40 people in each group. 
+
+d.) Are we likely to make a Type 1 error?
+
+*A type 1 error occurs when the null hypothesis is rejected when it is true. A 3% significance level means there is a 3% chance that the null hypothesis has been rejected when it is true, or there is a 3% chance of a type 1 error, making it unlikely.*
+
+e.) Are we likely to make a Type 2 error?
+
+*A type 2 error is more likely than type 1, as the type 2 error happens when the null hypothesis is accepted, even if there is a measurable effect. Increasing the significance level reduces the risk of type 1 error, but proportionally increases the risk of type 2 error.*
+
+f.) What two options are there to reducing the Type 2 error?   What are the drawbacks of each of these
+approaches.
+
+Source: https://corporatefinanceinstitute.com/resources/data-science/type-ii-error/#:~:text=1.,the%20power%20of%20a%20test.
+
+*Option 1: Reduce the significance level, which could lead to more type 1 errors.*
+*Option 2: Increase the sample size. This increases the ability to detect differences in the hypothesis test. This could lead to false conclusions, as small effects are more significant.*
+
+
+# Problem 3
+
+GRE scores, Part I. Sophia who took the Graduate Record Examination (GRE) scored 160 on the Ver-
+bal Reasoning section and 157 on the Quantitative Reasoning section. The mean score for Verbal Reasoning
+section for all test takers was 151 with a standard deviation of 7, and the mean score for the Quantitative
+Reasoning was 153 with a standard deviation of 7.67. Suppose that both distributions are nearly normal.
+
+(a) Write down the short-hand for these two normal distributions.
+
+*Verbal: N(µ=151,σ=7), Quantitative: N(µ=153,σ=7.67)*
+
+(b) What is Sophia's Z-score on the Verbal Reasoning section? On the Quantitative Reasoning section?
+Draw a standard normal distribution curve and mark these two Z-scores.
+
+```{r}
+#Compute verbal z-score:
+x_verb <- 160
+µ_verb <- 151
+σ_verb <- 7
+
+Z_verb <- (x_verb-µ_verb)/σ_verb
+
+#Compute quantitative Z-score
+x_quant <- 157
+µ_quant <- 153
+σ_quant <- 7.67
+
+Z_quant <- (x_quant-µ_quant)/σ_quant
+
+Z_verb
+Z_quant
+
+```
+
+```{r}
+x=seq(-5,5,0.05)
+ypdf=dnorm(x)
+plot(x,ypdf)
+abline(v=Z_verb, col="red")
+abline(v=Z_quant, col="blue")
+```
+
+(c) What do these Z-scores tell you?
+
+*The z-score is the distance from an observation to the mean, therefore the larger z-score, the better Sophia performed compared to the rest of the population.*
+
+(d) Relative to others, which section did she do better on?
+
+*Verbal, because of the higher z-score.*
+
+(e) Find her percentile scores for the two exams.
+
+```{r}
+paste0("Verbal percentile: ", round(pnorm(x_verb, µ_verb, σ_verb)*100, 0),"th")
+paste0("Quantitative percentile: ", round(pnorm(x_quant, µ_quant, σ_quant)*100, 0),"th")
+```
+
+(f) What percent of the test takers did better than her on the Verbal Reasoning section? On the Quantitative
+Reasoning section?
+
+```{r}
+paste0("Verbal: ", round((1-pnorm(x_verb, µ_verb, σ_verb))*100, 2),"%")
+paste0("Quantitative: ", round((1-pnorm(x_quant, µ_quant, σ_quant))*100, 2),"%")
+```
+
+(g) Explain why simply comparing raw scores from the two sections could lead to an incorrect conclusion
+as to which section a student did better on.
+
+*The raw scores do not account for the relative difficulty of the test. By comparing the student's score relative to the population for each test, you can determine the student's strength in a given domain in a manner that is controlled for test difficulty.*
+
+(h) If the distributions of the scores on these exams are not nearly normal, would your answers to parts (b)
+- (f) change? Explain your reasoning.
+
+*Yes, the fact that the distribution is normal is what enables the analysis performed above. The normal distribution can be characterized by the mean and standard deviation, and it is symmetric about the mean, giving rise to z-scores as a metric.*
+
+# Problem 4
+
+Gaming and distracted eating. 
+
+Researchers investigated the effects of being distracted by a game on how much people eat. The 22 patients in the treatment group who ate their lunch while playing solitaire were asked to do a serial-order recall of the food lunch items they ate.
+
+The average number of items recalled by the patients in this group (n=47) was 4.9, with a standard deviation of
+1.8. The average number of items recalled by the patients in the control group (no distraction, n=35) was 6.1, with
+a standard deviation of 1.8. Do these data provide strong evidence that the average number of food items
+recalled by the patients in the treatment and control groups are different?
+
+1.) Consider the confidence intervals and form an argument for significance based on the confidence intervals.
+
+*SE=sd/(n)^0.5*
+
+```{r}
+n_dist=47
+sd_dist=1.8
+
+SE_dist=sd_dist/(n_dist)^0.5
+SE_dist
+
+n_cont=35
+sd_cont=1.8
+
+SE_cont=sd_cont/(n_cont)^0.5
+SE_cont
+
+```
+
+*Compute the 95% confidence interval for both data sets.*
+
+```{r}
+mean_dist=4.9
+upper_dist=mean_dist+SE_dist*1.96
+lower_dist=mean_dist-SE_dist*1.96
+upper_dist
+lower_dist
+
+mean_cont=6.1
+upper_cont=mean_cont+SE_cont*1.96
+lower_cont=mean_cont-SE_cont*1.96
+upper_cont
+lower_cont
+
+```
+
+*There is no overlap between the confidence intervals in the test and control groups, therefore there is strong evidence that the number of food items reported by each group are different.*
+
+2.) Look up the formula for the t-test  (aka student's t-test) for unequal sample sizes and  unequal variances (ie unequal standard deviations)
+
+Sources:
+
+- https://www.msicertified.com/students-t-test/
+
+- https://en.wikipedia.org/wiki/Student%27s_t-test
+
+- [Minitab](https://support.minitab.com/en-us/minitab/help-and-how-to/statistics/basic-statistics/supporting-topics/data-concepts/what-is-the-pooled-standard-deviation/#:~:text=The%20pooled%20standard%20deviation%20is%20the%20average%20spread%20of%20all,effect%20on%20the%20overall%20estimate.)
+
+- [datacamp](https://www.datacamp.com/tutorial/t-tests-r-tutorial?utm_source=google&utm_medium=paid_search&utm_campaignid=19589720830&utm_adgroupid=157156377351&utm_device=c&utm_keyword=&utm_matchtype=&utm_network=g&utm_adpostion=&utm_creative=733936254908&utm_targetid=aud-1832882613722:dsa-2218886984060&utm_loc_interest_ms=&utm_loc_physical_ms=9002297&utm_content=&utm_campaign=230119_1-sea~dsa~tofu_2-b2c_3-nam_4-prc_5-na_6-na_7-le_8-pdsh-go_9-nb-e_10-na_11-na-feb25&gad_source=1&gclid=CjwKCAiAw5W-BhAhEiwApv4goC3BsSTEQwQymTiruIJcMGllZwVpUblTUeFKpPB4jbnzgIfXY9O9HBoCjRkQAvD_BwE)
+
+    a.) What is the pooled standard deviation?
+    
+*The pooled standard deviation is the weighted average of each group's standard deviation, which gives larger groups a proportionally greater effect on the overall estimate.*
+
+    b.) What is the t-test value (ie what is t)
+    
+```{r}
+t=(mean_dist-mean_cont)/((sd_dist^2/n_dist)+(sd_cont^2/n_cont))^0.5
+t
+```
+    c.) Use the function pt(t,n)  where t is the t-test value and n is the total number of observations minus 2
+        to find the probability of t or less by chance.   Is this signficant at 5%.
+        
+```{r}
+pt(t,n_dist+n_cont-2)
+```
+*This is significant, as the output is about 0.2%*
+
+# Problem 5
+
+Load the data set "Cushings" from the library "Mass".
+
+```{r}
+library(MASS)
+```
+
+```{r}
+data(Cushings)
+head(Cushings)
+```
+
+
+a.) Find out where this data set came from and explain what the variables are, briefly.
+
+*This data set came from diagnostic tests on patients with Cushing's Syndrome. Tetrahydrocortisone is the urinary excretion rate, in mg per day, of Tetrahydrocortisone. Pregnanetriol is the urinary excretion rate, in mg per day, of Pregnanetriol. Type is the underlying type of syndrome, coded a (adenoma) , b (bilateral hyperplasia), c (carcinoma) or u for unknown.*
+
+b.) Produce a box plot that shows the two measured excreted compounds for each of the 4 groups in Type.     The x-axis should list the two compounds and it should be color coded by group.
+
+```{r}
+library(tidyverse)
+```
+
+
+```{r}
+cushings_longer <- Cushings |> pivot_longer(!Type, names_to = "metabolites", values_to = "excretion_rate")
+head(cushings_longer)
+```
+
+
+```{r}
+library(ggplot2)
+```
+
+```{r}
+ggplot(
+  data = cushings_longer,
+  mapping = aes(x=metabolites, y=excretion_rate, fill=Type)
+) + geom_boxplot()
+```
+
+c.) Explain the issue posed by the "u" category.
+
+*The 'u' category is of an unknown syndrome, and the excretion rate closely resembles that of the other categories, so it may be difficult to draw conclusions based on the 'unknown' data.*
+
+d.) Run ANOVA for each of the two compounds as predicted the Type factor
+
+```{r}
+tetra_aov<-aov(Tetrahydrocortisone ~ Type, data=Cushings)
+pregna_aov<-aov(Pregnanetriol ~ Type, data=Cushings)
+
+summary(tetra_aov)
+summary(pregna_aov)
+```
+
+e.) Based on the graph,  were their meaningful differences in the groups?
+
+*The graphs indicated moderate differences between the groups. In every case, there was some overlap between groups, but the IQR for each group is moderately distinct.*
+
+f.) Is the ANOVA in agreement with the graphs?
+
+*The ANOVA indicates that there is slight difference (p-value<0.05, i.e. null hypothesis is rejected) between type and the respective metabolite excretion rates, which agrees with the graphs.*
+
+# Problem 6
+
+Load the data set "iris" from the r datasets, it is a standard data set.
+
+```{r}
+data(iris)
+head(iris)
+```
+
+a.) What test would you use to test the hypothesis that the Sepal.length was more variable in setosa than in versicolor?
+
+*An F-test would be required.*
+
+b.) Run this test in R.   Did the hypothesis hold?
+
+```{r}
+var.test(iris[iris$Species=="setosa", 1], iris[iris$Species=="versicolor", 1])
+```
+
+*The p-value is less than 0.05, therefore the null hypothesis is rejected, indicating that the variances are different. The hypothesis does hold*
+
+c.) Does the species variable predict differences in Sepal.Width?  What test would you
+use to test this hypothesis?
+
+*An ANOVA test would be used to test this hypothesis.*
+
+```{r}
+summary(aov(Sepal.Width ~ Species, iris))
+```
+
+*The species variable strongly predicts differences in Sepal.Width. This is indicated by the near 0 p-value, rejecting the null hypothesis.*
+
+
+#Problem 7
+
+Load the data set "crabs" from the library "Mass".
+
+```{r}
+data(crabs)
+head(crabs)
+```
+
+a.) Build a regression model of rear width predicted by frontal lobe size for the female blue crabs only. Is it significant?  What is the confidence interval on the slope?
+
+```{r}
+fem_blue <- crabs |>
+  filter(sex=="F" & sp=="B")
+model=lm(RW ~ FL, data=fem_blue)
+summary(model)
+```
+
+*Frontal lobe size is a significant predictor of rear width based on the near zero p-value*
+
+*95% Confidence Interval = slope +- 1.96xSE*
+
+```{r}
+#Compute the 95% confidence interval
+upper=0.90928+1.96*0.0268
+lower=0.90928-1.96*0.0268
+
+upper
+lower
+```
+
+b.) Build the same model for the female orange crabs only.  Is it significant?   What is the confidence interval on the slope?
+
+```{r}
+fem_orange <- crabs |>
+  filter(sex=="F" & sp=="O")
+model1=lm(RW ~ FL, data=fem_orange)
+summary(model1)
+```
+
+*Frontal lobe size is a significant predictor of rear width based on the near zero p-value*
+
+*95% Confidence Interval = slope +- 1.96xSE*
+
+```{r}
+#Compute the 95% confidence interval
+upper_1=0.76041+1.96*0.03073
+lower_1=0.76041-1.96*0.03073
+
+upper_1
+lower_1
+```
+
+c.).  Are the slopes describing the relationship of carapace length to frontal lobe statistically significantly different for females of the two species?  Use what you know about the confidence intervals on the slopes.
+
+```{r}
+model2=lm(CL ~ FL, data=crabs[crabs$sex=="F" & crabs$sp=="B",])
+summary(model2)
+
+model3=lm(CL ~ FL, data=crabs[crabs$sex=="F" & crabs$sp=="O",])
+summary(model3)
+```
+
+*Compute the confidence intervals.*
+
+```{r}
+upper_2=2.24075+1.96*0.03342
+lower_2=2.24075-1.96*0.03342
+
+upper_2
+lower_2
+
+upper_3=1.94151+1.96*0.04155
+lower_3=1.94151-1.96*0.04155
+
+upper_3
+lower_3
+
+```
+
+*They are different, as there is no overlap in the 95% confidence interval on the two slopes.*
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

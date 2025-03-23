@@ -1,0 +1,756 @@
+---
+title: "Midterm"
+author: "HD Sheets"
+date: "2024-09-11"
+output: html_document
+editor_options: 
+  markdown: 
+    wrap: 72
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+##DSE 5001 Mid Term, Spring 1, 2025
+
+We will use some data from the fivethirtyeight site, and from some other
+sources
+
+Prep for the exam by making sure you can do all these problems, and that
+you understand the content of each data set.
+
+You may want to do some research on your own to understand these data
+sets a bit, and to be sure you understand the ideas in each problem.
+
+Prepare an RMD with answers to all of these problems. You may use the
+RMD and other sources of information during the exam. You can look
+things up during the exam, but you cannot asking questions of another
+living person, or of LLM models like ChatGPT or Claude.
+
+(If you want to try to ask questions of non-living person's that's your
+call, but most ghosts just don't know much R, as far as I can tell).
+
+Turn in your prepared RMD with all answers prepared and annotated at the
+start of the exam. The preparation is 40% of the exam grade.
+
+Then you will get 3 randomly chosen questions from this set of questions
+to answer on the exam during the one-hour exam window.
+
+The questions during the live exam will be modified, so while you can
+(and should) cut and paste answers from your preparation RMD, you will
+need to modify your answers to reflect the changes in the exam question
+
+I might alter the exam question by
+
+a.) changing the data set b.) changing what variables I want to see
+plotted, or in a table c.) changing ranges of values
+
+I will use the Quiz function in Canvas to randomly give you three
+problems, cut and paste these into an RMD and then use your prepared
+code to answer them. You can just paste the altered problems right into
+your prepared RMD if that helps.
+
+I will answer questions about the problem statements, but will not tell
+you if you have a problem correct or not.
+
+Most of the questions are derived from homework and/or PairProgramming
+examples from Modules 1 to 4
+
+Module 5 content is not covered on this exam, the final will be Modules
+5 to 7
+
+This exam thus has a "take home preparation" portion and a "live"
+portion. Due to the sheer volume of material in the class and the rapid
+pace, this format will reward extensive preparation work, and lower the
+impact of work during the one hour exam window. At the same time, you do
+have to be able to execute the code quickly, demonstrating that you
+understand how it works.
+
+# Exam Time
+
+The exam will open at 5 pm EST Feb 13 and close at 9pm Friday Feb 14,
+you must complete the exam in a one-hour long block within that time
+frame
+
+Note: I have be available on Zoom from 7 to 9 pm EST on Thursday Feb 13
+and 7-9 pm EST on Friday Feb 14, so that you can jump on zoom if you
+have to ask me questions. I strongly urge you to take the exam during
+one of the times when I am online. I cannot guarantee you will be able
+to ask me questions at other times during the exam window. If you feel
+you will want to be able to ask questions, try to plan on taking the
+exam between 7-9 pm EST on Thursday or Friday.
+
+# Exploratory Analysis
+
+It is wise to do a bit of basic exploratory data analysis on these data
+sets, even if I don't explicitly ask for it.
+
+```{R}
+library("fivethirtyeight")
+library("tidyverse")
+library("dplyr")
+```
+
+#Airline Safety, From the 538 data, Problem 1
+
+Airline safety Data
+
+```{R}
+head(airline_safety)
+```
+
+a.) How many distinct airlines are there?
+
+```{r}
+length(unique(airline_safety$airline))
+```
+
+a.) Which airlines (top 5) had the most:
+
+1.) incidents from 85-99?
+
+```{r}
+airlines <- airline_safety |>
+  group_by(airline) |>
+  arrange(desc(incidents_85_99))
+
+head(airlines, 5)
+```
+
+2.) incidents from 00-14?
+
+```{r}
+airlines <- airline_safety |>
+  group_by(airline) |>
+  arrange(desc(incidents_00_14))
+
+head(airlines, 5)
+```
+
+3.) how much overlap was there of the two lists
+
+*Delta / Northwest, American, and United / Continental were all
+overlapping*
+
+b.) Create a graph that shows whether or not incidents from 85-99
+predicts the number of incidents from 00-14. Find the correlation
+
+```{r}
+#create a plot
+ggplot(airline_safety,aes(x=incidents_85_99,y=incidents_00_14))+geom_point()
+
+incidents <- airline_safety |> 
+  select(incidents_85_99, incidents_00_14)
+incidents
+```
+
+```{r}
+library('GGally')
+ggpairs(incidents)
+
+```
+
+c.) Find a KPI or measure that computes incidents per
+avail_seat_km_per_week, compute this for 85_99 and 00_14
+
+*This sounds like we want to normalize incident counts based on how
+often an airline flies. A safer airline would have fewer incidents per
+available seat kilometers flown every week. The avail_seat_km_per_week
+variable sounds like it has the plane size data compressed into it, i.e.
+a larger plane with more seats has a higher avail_seat_km_per_week per
+kilometer flown. This is probably in an attempt to normalize across
+smaller private planes and larger commercial jets. Based on this
+analysis, the KPI I would use is incidents/avail_seat_km_per_week*
+
+```{r}
+incidents_per_flight_volume <- airline_safety |>
+  mutate(incidents_per_flight_volume_85_99=(incidents_85_99/avail_seat_km_per_week)) |>
+  mutate(incidents_per_flight_volume_00_14=(incidents_00_14/avail_seat_km_per_week))
+incidents_per_flight_volume  
+```
+
+d.) Create a plot that shows whether high incidents per
+avail_seat_km_per_week in 85-99 predicts the number of incidents from
+00-14
+
+```{r}
+incident_correlation <- incidents_per_flight_volume |>
+  select(incidents_per_flight_volume_85_99, incidents_per_flight_volume_00_14)
+ggpairs(incident_correlation)
+```
+
+e.) What are the top 5 and bottom 5 airlines, based on avail_seat_km_per
+week?
+
+```{r}
+top_5 <- airline_safety |>
+  group_by(airline) |>
+  arrange(desc(avail_seat_km_per_week))
+head(top_5, 5)
+```
+
+```{r}
+bottom_5 <- airline_safety |>
+  group_by(airline) |>
+  arrange(avail_seat_km_per_week)
+head(bottom_5, 5)
+```
+
+e.) What different factors go into available_seat_km_per_week? How do
+different operational factors in an airline influence this measure? What
+specific information (ie additional data variables) would let you
+improve this analysis? This question is on the preparation section only.
+
+*The following factors go into available_seat_km_per_week: plane size, flight duration, flight frequency, number of available planes in the airline, and population density of the country of origin. These operational factors are all positively correlated with this measure, as they all affect the number of seats, number of flights, or distance traveled in a given week. One way to improve this analysis is to add the following variables: per capita GDP of home country (I found this in the [article about the data set](https://fivethirtyeight.com/features/should-travelers-avoid-flying-airlines-that-have-had-crashes-in-the-past/)), total flights per week (from this, we could deduce the average number of km per flight), and number of staff (from this we can better understand the safety implications of under staffing airlines).*
+
+# Comma Survey from 538, Problem 2
+
+This is a set of survey results related to the "Oxford Comma"
+
+```{R}
+head(comma_survey)
+```
+
+a.) Look up what the "Oxford Comma" is and why it seems to be a concern (prepartion only)
+
+*The oxford comma a comma used prior the word "and" in a written list. For example, left, right, and center utilizes the oxford comma, but left, right and center does not. I am personally concerned with the oxford comma, and my very strong opinion is that it is a mechanism to provide important context in a list. Without the oxford comma, it could be interpreted that independent factors are related. For example, let's say someone is describing the primary colors of several independent images. With the oxford comma, they would list purple, orange, black, and white. This clearly delimits the color black from white, proving to the reader that each color is with respect to an individual image. Without the oxford comma, they would list orange, purple, black and white. From the reader's perspective, there is no way to determine if there are four images, 1.orange 2.purple 3.black 4.white, or three images, 1.orange 2.purple 3.black and white, and what the respective colors of those images are, unless it is explicitly stated otherwise. The oxford comma is a simple way to increase the information density of a written text, and erases ambiguity that could otherwise be detrimental.*
+
+b.) For the variable "more_grammar_correct", how many different answers are there? Make these factors
+
+```{r}
+length(unique(comma_survey$more_grammar_correct))
+```
+```{r}
+comma_survey <- comma_survey |>
+  mutate(more_grammar_correct_as_factor=as.factor(comma_survey$more_grammar_correct))
+```
+
+c.) Which of responses to more_grammar_correct" is the Oxford commma? Create a new column that is TRUE or FALSE for "more_grammar_correct" choosing the Oxford comma.
+
+*The oxford comma response is "It's important for a person to be honest, kind, and loyal."*
+
+Source for counting character occurrences: https://www.geeksforgeeks.org/count-number-of-occurrences-of-certain-character-in-string-in-r/
+Source for conditional mutate: https://stackoverflow.com/questions/24459752/can-dplyr-package-be-used-for-conditional-mutating
+
+```{r}
+#There are plenty of ways to do this, but I wanted to learn more about string parsing in R, so I chose to do it this way
+oxford_parsing <- comma_survey |>
+  mutate(oxford_comma_parse = ifelse(lengths(regmatches(more_grammar_correct, gregexpr(",", more_grammar_correct)))<2, FALSE, TRUE), .after = more_grammar_correct)
+oxford_parsing
+
+#another cool way to do this would be to evaluate the length of the string, since the oxford comma string will always be longer, in this case
+oxford_str_len <- comma_survey |>
+  mutate(oxford_comma_str = ifelse(nchar(more_grammar_correct)<max(nchar(more_grammar_correct)), FALSE, TRUE), .after = more_grammar_correct)
+oxford_str_len
+
+#lastly, the least elegant way to do this (in my opinion) is to check for a complete match against the more_grammar_correct variable
+oxford_complete_match <- comma_survey |>
+  mutate(oxford_comma_match=ifelse(more_grammar_correct_as_factor=="It's important for a person to be honest, kind and loyal.", FALSE, TRUE), .after = more_grammar_correct) 
+oxford_complete_match
+```
+
+
+c.) Many other variables are really factors, some are listed as chr some are already set as ordinal. For variables that should be factors, set them as factors. Try to use NA as a valid factor entry, as the missing value may be indicative of some attitude. You may have to read up on how to do this.
+
+*I found this neat source on the mutate function: https://sparkbyexamples.com/r-programming/replace-using-dplyr-package-in-r/. I am going to replace all chr with factors, as they can all be broken into discrete categories. It seems like this implementation just works for NA as a factor entry.*
+
+```{r}
+factorized_comma_survey <- comma_survey |>
+  mutate_if(is.character, as.factor)
+factorized_comma_survey
+
+#test NA as factor
+test <- factorized_comma_survey |>
+  group_by(gender)
+test
+```
+
+
+d.) Create a table that shows the counts of Male, Female and NA values
+by whether or not the
+
+d1.) Had heard of the Oxford Comma
+
+```{r}
+heard_by_gender <- factorized_comma_survey |>
+  group_by(gender) |>
+  summarize(
+    heard_count = sum(heard_oxford_comma==TRUE, na.rm=TRUE), 
+    not_heard_count = sum(heard_oxford_comma==FALSE, na.rm=TRUE)
+            )
+heard_by_gender
+```
+
+
+d2.) Preferred the Oxford Comma (using your answer/results from C)
+
+```{r}
+preferred_by_gender <- oxford_parsing |>
+  mutate_if(is.character, as.factor) |>
+  group_by(gender) |>
+  summarize(
+    preferred_count = sum(oxford_comma_parse==TRUE, na.rm=TRUE), 
+    not_preferred_count = sum(oxford_comma_parse==FALSE, na.rm=TRUE)
+            )
+preferred_by_gender
+```
+
+Explain what this tabular data means.
+
+*Across the three groups, it appears that men, women, and the NA category all prefer the oxford comma. Interestingly, at first glance, this also looks to be proportional to whether or not each group has heard of the oxford comma.*
+
+e.) Add the location to your table in part d.
+
+```{r}
+heard_by_gender <- factorized_comma_survey |>
+  group_by(gender, location) |>
+  summarize(
+    heard_count = sum(heard_oxford_comma==TRUE, na.rm=TRUE), 
+    not_heard_count = sum(heard_oxford_comma==FALSE, na.rm=TRUE)
+            )
+heard_by_gender
+```
+
+```{r}
+preferred_by_gender <- oxford_parsing |>
+  mutate_if(is.character, as.factor) |>
+  group_by(gender,location) |>
+  summarize(
+    preferred_count = sum(oxford_comma_parse==TRUE, na.rm=TRUE), 
+    not_preferred_count = sum(oxford_comma_parse==FALSE, na.rm=TRUE)
+            )
+preferred_by_gender
+```
+
+Explain what this table means.
+
+*Each table breaks down the respective counts for men, women, and NA by region in the US, giving the viewer a top level overview of how gender, region, or both affect the counts.*
+
+#Bechdel test results,Problem 3
+
+<https://en.wikipedia.org/wiki/Bechdel_test>
+
+This is a data set that looks at whether movies with higher performance
+on the Bechdel test (essentially looking at the dialogue spoken by
+women) impacts on the profitability of the movie.
+
+Read both the Wikipedia article above and the help information for this
+data
+
+```{R}
+head(bechdel)
+```
+
+a.) Decide what criteria you should use to decide how successful a movie was, based on budget, domestic gross and international gross (ie a KPI). Consider several alternatives and explain your choice of the best measure. Add a column to the data set that holds this KPI to the data set
+
+*I believe the best metric would be the ratio between the budget and the sum of gross earnings (i.e. (budget)/(domestic gross + international gross)). An alternative measure could be the ratio between domestic gross and international gross, which would eliminate budget as an influence. The thought here is that the more successful a movie is domestically, the more it will be marketed for international sale, which is a much larger audience than the US alone. A high success movie would have a high (intgross/domgross) value. This, however, is a worse metric than (budget)/(domestic gross + international gross) because a movie could have very few sales, but do far better in an international market, which would lead to an incorrect conclusion.*
+
+```{r}
+bechdel <- bechdel |>
+  mutate(kpi=(budget)/(intgross+domgross), .after = intgross)
+head(bechdel)
+```
+
+
+b.) Produce a graph that shows your success measure (a) as a function of
+the binary pass variable.
+
+```{r}
+#create a plot
+ggplot(
+  data = bechdel,
+  mapping = aes(x=binary, y=log(kpi, base = 10), color = binary)
+) + geom_boxplot() 
+```
+
+c.) Produce a graph that shows your success measure as a function of the
+"clean_test" category
+
+```{r}
+#create a plot
+ggplot(
+  data = bechdel,
+  mapping = aes(x=clean_test, y=log(kpi, base = 10), color = clean_test)
+) + geom_boxplot() 
+```
+
+
+d.) Produce a scatterplot that shows your success measure as a function
+of time, with color coding by the "clean_test" value.
+
+```{r}
+#create a plot
+ggplot(
+  data = bechdel,
+  mapping = aes(x=year, y=log(kpi, base = 10), color = clean_test)
+) + geom_point() 
+```
+
+
+# Palmer Penguins Data Set Problem 4
+
+```{R}
+library("palmerpenguins")
+```
+
+```{R}
+head(penguins)
+
+```
+
+a.) Create a long version of the data set, with species, island and sex
+as indices (variables), the bill length, bill depth, flipper length and
+body mass should be in the names_to setting and the values in values,
+year should be dropped
+
+It should look like this
+
+Species island sex Variable Value 
+Adelie Torgerson male bill_lenth_mm 39.1 
+Adelie Torgerson male bill_depth_mm 18.7 
+Adelie Torgerson male flipper_length_mm 181 
+Adelie Torgerson male body_mass_g 3750 
+Adelie Torgerson female bill_lenth_mm 39.5 
+Adelie Torgerson female bill_depth_mm 17.4 
+Adelie Torgerson female flipper_length_mm 18 
+Adelie Torgerson female body_mass_g 3800
+
+```{r}
+penguins_long <- penguins |>
+  select(!year) |>
+  pivot_longer(!species & !island & !sex, names_to="Variable", values_to="Value")
+head(penguins_long)
+```
+
+b.) Produce a box plot that shows the all the Variables (bill_length,
+bill_depth,flipper_length and body_mass) for each species, using the
+long data
+
+```{r}
+ggplot(
+  data=penguins_long,
+  mapping=aes(x=species, y=log(Value), fill=Variable)
+) + geom_boxplot()
+```
+
+c.) Show a violin plot that shows all the variables (bill_length,
+bill_depth,flipper_length and body_mass) for each species and sex, using
+the long data
+
+```{r}
+#create a column that combines sex and species
+penguins_long_sex_species <- penguins_long |>
+  mutate(species_sex=as.factor(paste0(species, " ", sex)), .before=island) |>
+  select(!species & !sex) |>
+  filter(!is.na(Value))
+  
+#verify this did what I want
+penguins_long_sex_species
+
+ggplot(
+  data=penguins_long_sex_species,
+  mapping=aes(x=species_sex, y=log(Value), fill=Variable)
+) + geom_violin() + theme(axis.text.x = element_text(angle = 90))
+```
+
+*Seems like body mass is messing up the y-axis. Normalize all values from 0-1 to make this a little easier to understand.*
+
+```{r,fig.dim = c(32, 12)}
+#Find the max value of each variable to normalize against
+variables <- as.vector(unique(penguins_long_sex_species$Variable))
+max_list <- vector()
+
+#store all max values to a vector
+for (i in 1:length(variables)) {
+  filtered_df <- penguins_long_sex_species |>
+    filter(Variable==variables[i])
+  max_list[i] <- max(filtered_df$Value)
+}
+
+#check that the values have been captured
+max_list
+
+#Create a column that conditionally normalizes the data 
+penguins_long_sex_species_normalized <- penguins_long_sex_species |>
+  mutate(normalized_value=ifelse(
+    #condition
+    Variable==variables[1], 
+    #True
+    ((max_list[1]-Value)/max_list[1]), 
+    #False
+    ifelse(
+      #condition
+      Variable==variables[2], 
+      #True
+      ((max_list[2]-Value)/max_list[2]), 
+    #False
+    ifelse(
+      #condition
+      Variable==variables[3], 
+      #True
+      ((max_list[3]-Value)/max_list[3]),
+    #False
+    ((max_list[4]-Value)/max_list[4])
+    )
+    )
+    )
+    )
+ 
+#There was a lot of conditional calculation there...
+#verify this did what I want
+penguins_long_sex_species_normalized
+
+#plot the violin plot
+ggplot(
+  data=penguins_long_sex_species_normalized,
+  mapping=aes(x=species_sex, y=normalized_value, fill=Variable)
+) + geom_violin() + theme(
+  legend.text = element_text(size = 14),
+  axis.title = element_text(size = 20,face="bold"),
+  axis.text = element_text(size = 18),
+  axis.text.x = element_text(angle = 90)
+  ) 
+```
+
+*This is better, but I can't seem to get the plot to render with the correct width... I will have to do more research on this.*
+
+*NOTE ON THE COMMENT, ABOVE: I found [this source](https://bookdown.org/yihui/rmarkdown-cookbook/figure-size.html) when completing a problem later on.*
+
+# Pulitzer Prize Finalists and Newspaper circulation Problem 5
+
+Does the number of Pulitzer prize nominations influence circulation
+
+```{R}
+head(pulitzer)
+```
+
+a.) How many papers are there?
+
+```{r}
+length(unique(pulitzer$newspaper))
+```
+*There are 50 papers.*
+
+b.) Show a histogram of the distribution of percentage change in
+circulation from 2004 to 2013 over all newspapers.
+
+```{r}
+hist(pulitzer$pctchg_circ)
+```
+
+c.) Show a plot that indicates how the number of finals 1990_2003 might
+have influenced the percent change in circulation.
+
+```{r}
+#determine how correlated the two values are, then get a range over the x axis values
+correlation <- cor(pulitzer$num_finals1990_2003, pulitzer$pctchg_circ)
+x_range <- seq(min(pulitzer$num_finals1990_2003),max(pulitzer$num_finals1990_2003))
+
+#Filter ctchg_circ when num_finals1990_2003=0 so we can then find the y intercept of the correlation line
+x_0 <- pulitzer |>
+  filter(num_finals1990_2003==0)
+
+#determine a scaling factor for the correlation based on the standard deviation of the y data
+scale_factor <- 0.1*sd(pulitzer$pctchg_circ)
+
+#Create a data frame with the x and y correlation data
+correlation_data <- data.frame(x_cor=x_range, y_cor=(correlation*x_range*scale_factor)+mean(x_0$pctchg_circ))
+correlation_data
+
+#plot the scatter plot with the correlation overlayed on top
+ggplot(
+  data=pulitzer,
+  mapping=aes(x=num_finals1990_2003, y=pctchg_circ)
+) + 
+  geom_point() + 
+  geom_line(
+    data = correlation_data,
+    mapping=aes(x=x_cor, y=y_cor)
+  )
+```
+
+
+d.) Show a plot of the relationship of the circulation in 2004 to the
+number of finals 2004 to 2014
+
+```{r}
+#determine how correlated the two values are, then get a range over the x axis values
+correlation <- cor(pulitzer$num_finals2004_2014, pulitzer$circ2004)
+correlation
+x_range <- seq(min(pulitzer$num_finals2004_2014),max(pulitzer$num_finals2004_2014))
+
+#Filter ctchg_circ when num_finals2004_2014=0 so we can then find the y intercept of the correlation line
+x_0 <- pulitzer |>
+  filter(num_finals2004_2014==0)
+
+#determine a scaling factor for the correlation based on the standard deviation of the y data
+scale_factor <- 0.1*sd(pulitzer$circ2004)
+
+#Create a data frame with the x and y correlation data
+correlation_data <- data.frame(x_cor=x_range, y_cor=(correlation*x_range*scale_factor)+mean(x_0$circ2004))
+correlation_data
+
+#plot the scatter plot with the correlation overlayed on top
+ggplot(
+  data=pulitzer,
+  mapping=aes(x=num_finals2004_2014, y=circ2004)
+) + 
+  geom_point() + 
+  geom_line(
+    data = correlation_data,
+    mapping=aes(x=x_cor, y=y_cor)
+  )
+```
+
+e.) Show a ggpairs plot of this data set. Which variables are most
+highly correlated? What do you think this means?
+
+```{r,fig.dim = c(12, 8)}
+
+ggpairs(pulitzer, cardinality_threshold = length(unique(pulitzer$newspaper)))
+```
+
+*This doesn't quite look right... It seems like omitting the newspaper may help. Perhaps the cardinality threshold is there for a reason.*
+
+*Formatting Sources:* 
+https://bookdown.org/yihui/rmarkdown-cookbook/figure-size.html
+https://stackoverflow.com/questions/73289397/ggpairs-change-axis-label-font-size
+
+
+```{r,fig.dim = c(12, 8)}
+#Remove newspaper from the selected columns
+pulitzer_minus_np <- pulitzer |>
+  select(!newspaper)
+
+#Perform ggpairs with some reformatting
+ggpairs(pulitzer_minus_np) + theme(
+  strip.text.x = element_text(size = 6),
+  strip.text.y = element_text(size = 6), 
+  axis.text = element_text(size = 8),
+  axis.text.x = element_text(angle = 90)
+  )
+
+```
+
+*Ahhhh, much better. We don't care about the newspaper much anyway, these should be global trends across the press industry. The highest correlations are between num_finals1990_2014 and num_finals_1990_2003, num_finals1990_2014 and num_finals2004_2014, num_finals2004_2014 and num_finals_1990_2003, and circ2013 and circ2004, respectively. The Pulitzer Prize is a prestigious award, so it is unlikely that the number of Pulitzer prizes will dramatically increase over time, hence the strong correlation between the number of finalists in all of the different time ranges. Additionally, the number of papers in circulation daily should also be strongly correlated, especially in the time frames being analyzed. Media between 2004 and 2013 had begun to shift to a digital format, which likely stagnated the number of newspapers in favor of other news and media outlets. This would explain the near linear relationship between the number of papers in circulation from 2004 to 2013.*
+
+# Exponential distribution Problem 6
+
+We will be looking at the exponential distribution, which is a
+continuous distribution much like the normal or poison
+
+It has only one parameter a rate.
+
+We will look at an exponential distribution with a rate of .5
+
+Using a sequence of x values form 0 to 10 in steps of 0.1 (set up in
+code block below)
+
+```{r}
+x<-seq(0,10,0.1)
+```
+
+a.) Plot the probability distribution function (pdf) for an exponential
+distribution with rate 0.5
+
+```{r}
+ypdf=dexp(x, rate=0.5)
+plot(x, ypdf)
+```
+
+b.) Plot the cummulative probability distribution (cdf) for an
+exponential distribution with rate 0.5, add a grid to this
+
+```{r}
+ycdf=pexp(x,0.5)
+plot(x,ycdf)
+grid()
+```
+
+c.) Find the mean and standard deviation of this distribution
+
+```{r}
+mean(ycdf)
+sd(ycdf)
+```
+
+d.) What is the probablity that a value (x) from this distribution is
+greater than 2
+
+```{r}
+1-pexp(2,0.5)
+```
+
+e.) What is the probability that value (x) from this distribution is in
+the range 1 to 3?
+
+```{R}
+x=seq(0,10,0.1)
+
+upper <- pexp(3,0.5)
+lower <- pexp(1,0.5)
+upper-lower
+
+```
+
+# Log normal Distribution Problem #7
+
+The log normal has parameters meanlog and sdlog
+
+We will set meanlog=7, sdlog=1
+
+a.) Plot the log normal probability distribution function (pdf) for x=0
+to 10,000 using the x sequence list set up below
+
+Source: https://www.rdocumentation.org/packages/stats/versions/3.6.2/topics/Lognormal
+
+```{r}
+x=seq(0,10000,10)
+ypdf=dlnorm(x, mean = 7, sd = 1)
+plot(x, ypdf)
+```
+
+
+b.) Plot the log normal cumulative distribution function (cdf) for the
+same range of x. Add a grid to this plot
+
+```{r}
+x=seq(0,10000,10)
+ycdf=plnorm(x, mean = 7, sd = 1)
+plot(x, ycdf)
+grid()
+```
+
+c.) What are the mean and standard deviation of this distribution
+
+```{r}
+mean(ycdf)
+sd(ycdf)
+```
+
+d.) What is the maximum of the pdf?
+
+```{r}
+max(ypdf)
+```
+
+e.) What is the probability of a random x from this distribution being
+less than 500?
+
+```{r}
+plnorm(500, mean = 7, sd = 1)
+```
+
+f.) What is the probability of a random x from this distribution being
+less than 200 OR more than 1500?
+
+```{R}
+x=seq(0,10000,10)
+
+upper <- plnorm(1500, mean = 7, sd = 1)
+lower <- plnorm(200, mean = 7, sd = 1)
+
+#I am doing this to omit the portion of the distribution in the range 200:1500
+1-(upper-lower)
+```

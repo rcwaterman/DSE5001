@@ -1,0 +1,86 @@
+---
+title: "Module 03 HW 01"
+author: "HD Sheets"
+date: "2024-09-09"
+output: html_document
+---
+Checked 01/03/2025
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Module 03 Homework 01
+
+## Question 2A  Correlation
+
+```{R}
+require(maps)
+head(state.x77)
+
+state_df=data.frame(state.x77)
+```
+
+In this data set, we have data about US states in 1975, so this is old data
+
+We have variables that relate to life experiences
+
+Income, illiteracy, life expectancy, HS Graduation rate
+
+These are rates over the population of a state
+
+
+State your answers, then compute the correlation and explain what the anwer means.
+
+Which of these would you expect to have high positive correlation?
+
+Which pair would you expect to be most highly correlated?
+
+which pair would have the most negative correlation?
+
+```{R}
+#your code here
+
+```
+
+Create a correlation matrix of these 4 variables, and then visualize this 
+using a heatmap:
+
+See 
+
+    https://www.r-bloggers.com/2023/08/exploring-relationships-with-correlation-heatmaps-in-r/
+
+for a discussion of how to do this
+
+The correlation matrix is a *multivariate* extension of correlation, and 
+show the pattern of relationships of more than two variables at a time.
+
+Multivariate statistical are often not discussed in introductory courses, but
+are constantly present in data science. 
+
+Discuss how the heatmap can be used to answer the questions above, that you 
+answered using pairwise correlation coefficients.
+
+
+
+#Question 2b
+
+# Converting to long form (Melting) for a plot
+
+Pick your six favorite states from the state_df data set, and extract this to
+a data frame faveStates
+
+Convert the faveStates data set to long form, using the state name as the 
+identifier
+
+Produce a barplot that shows the Population, Income, Illiteracy Life Expectancy
+and Murder rates as locations along the x-axis,  each state should be a seperate bar, side by side for 
+each variable.   Color code by states.  The y-axis should be the magnitude of the variable value.
+
+Log transform the y-axis using logs to base 10 to improve readability.
+
+Create the plot using ggplot
+
+
+

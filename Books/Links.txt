@@ -1,0 +1,2 @@
+https://eleuven.github.io/statthink/
+https://r4ds.hadley.nz/
